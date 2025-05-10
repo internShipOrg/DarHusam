@@ -39,6 +39,12 @@ export default function HeroSection() {
             >
               اكتشف برامجنا
             </Link>
+            <Link
+              to="/join-us"
+              className="ml-4 mt-4 md:mt-0 inline-block px-8 py-3 rounded-lg text-lg font-medium transition-all duration-300 border-2 border-[#780C28] text-[#780C28] hover:bg-[#780C28] hover:text-white"
+            >
+              سجل الآن
+            </Link>
           </div>
           
           {/* Image */}

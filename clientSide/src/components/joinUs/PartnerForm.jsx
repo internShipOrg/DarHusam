@@ -28,51 +28,54 @@ const PartnerForm = () => {
     const errors = {};
 
     if (step === 1) {
-      if (!formData.organizationName) 
+      if (!formData.organizationName.trim()) 
         errors.organizationName = "اسم المؤسسة مطلوب";
       
-      if (!formData.organizationLocation) 
+      if (!formData.organizationLocation.trim()) 
         errors.organizationLocation = "موقع المؤسسة مطلوب";
       
-      if (!formData.industry) 
+      if (!formData.industry.trim()) 
         errors.industry = "مجال عمل المؤسسة مطلوب";
       
       if (formData.isLicensed && !formData.licenseImage)
         errors.licenseImage = "يرجى إرفاق صورة الترخيص";
     } else if (step === 2) {
       // التحقق من بيانات المدير
-      if (!formData.director.name) 
+      if (!formData.director.name.trim()) 
         errors["director.name"] = "اسم المدير مطلوب";
       
-      if (!formData.director.phone) 
+      if (!formData.director.phone.trim()) 
         errors["director.phone"] = "رقم هاتف المدير مطلوب";
-      else if (!/^\d{10}$/.test(formData.director.phone))
+      else if (!/^\d{10}$/.test(formData.director.phone.trim()))
         errors["director.phone"] = "رقم الهاتف يجب أن يتكون من 10 أرقام";
       
-      if (!formData.director.email) 
+      if (!formData.director.email.trim()) 
         errors["director.email"] = "بريد المدير الإلكتروني مطلوب";
-      else if (!/\S+@\S+\.\S+/.test(formData.director.email))
+      else if (!/\S+@\S+\.\S+/.test(formData.director.email.trim()))
         errors["director.email"] = "الرجاء إدخال بريد إلكتروني صحيح";
       
       // التحقق من بيانات مسؤول التواصل
-      if (!formData.liaison.name) 
+      if (!formData.liaison.name.trim()) 
         errors["liaison.name"] = "اسم مسؤول التواصل مطلوب";
       
-      if (!formData.liaison.phone) 
+      if (!formData.liaison.phone.trim()) 
         errors["liaison.phone"] = "رقم هاتف مسؤول التواصل مطلوب";
-      else if (!/^\d{10}$/.test(formData.liaison.phone))
+      else if (!/^\d{10}$/.test(formData.liaison.phone.trim()))
         errors["liaison.phone"] = "رقم الهاتف يجب أن يتكون من 10 أرقام";
       
-      if (!formData.liaison.email) 
+      if (!formData.liaison.email.trim()) 
         errors["liaison.email"] = "بريد مسؤول التواصل الإلكتروني مطلوب";
-      else if (!/\S+@\S+\.\S+/.test(formData.liaison.email))
+      else if (!/\S+@\S+\.\S+/.test(formData.liaison.email.trim()))
         errors["liaison.email"] = "الرجاء إدخال بريد إلكتروني صحيح";
     } else if (step === 3) {
-      if (!formData.partnershipType) 
+      if (!formData.partnershipType.trim()) 
         errors.partnershipType = "نوع الشراكة مطلوب";
       
-      if (!formData.duration) 
+      if (!formData.duration.trim()) 
         errors.duration = "مدة الشراكة مطلوبة";
+      
+      if (!formData.confirmation)
+        errors.confirmation = "يرجى تأكيد صحة المعلومات";
     }
 
     setFormErrors(errors);
@@ -109,23 +112,70 @@ const PartnerForm = () => {
   };
 
   const handleFileChange = (e) => {
-    // تخزين صورة الترخيص
     const file = e.target.files[0];
     if (file) {
-      // تحويل الملف إلى Base64 string للتخزين والإرسال
+      // Check file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        setFormErrors({
+          ...formErrors,
+          licenseImage: "حجم الصورة يجب أن لا يتجاوز 2 ميجابايت"
+        });
+        return;
+      }
+
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        setFormErrors({
+          ...formErrors,
+          licenseImage: "يرجى اختيار ملف صورة صالح"
+        });
+        return;
+      }
+
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData({
-          ...formData,
-          licenseImage: reader.result,
-        });
-        
-        if (formErrors.licenseImage) {
-          setFormErrors({
-            ...formErrors,
-            licenseImage: "",
+        // Compress the image
+        const img = new Image();
+        img.src = reader.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800;
+          const MAX_HEIGHT = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Convert to base64 with reduced quality
+          const compressedImage = canvas.toDataURL('image/jpeg', 0.7);
+          
+          setFormData({
+            ...formData,
+            licenseImage: compressedImage,
           });
-        }
+          
+          if (formErrors.licenseImage) {
+            setFormErrors({
+              ...formErrors,
+              licenseImage: "",
+            });
+          }
+        };
       };
       reader.readAsDataURL(file);
     }
@@ -146,46 +196,64 @@ const PartnerForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateStep(currentStep)) {
-      return;
-    }
-
-    if (!formData.confirmation) {
-      setFormErrors({
-        ...formErrors,
-        confirmation: "يرجى تأكيد صحة المعلومات",
-      });
-      return;
+    // Validate all steps before submission
+    for (let step = 1; step <= totalSteps; step++) {
+      if (!validateStep(step)) {
+        setCurrentStep(step);
+        return;
+      }
     }
 
     setLoading(true);
 
     try {
-      await axios.post("http://localhost:5000/api/partners", formData);
-      setSubmitSuccess(true);
-      setFormData({
-        organizationName: "",
-        organizationLocation: "",
-        isLicensed: false,
-        industry: "",
-        director: { name: "", phone: "", email: "" },
-        liaison: { name: "", phone: "", email: "" },
-        partnershipType: "",
-        duration: "",
-        expectations: "",
-        ourOffer: "",
-        socialMedia: "",
-        licenseImage: "",
-        confirmation: false,
+      const response = await axios.post("http://localhost:5000/api/partners", {
+        ...formData,
+        // Ensure all required fields are present and properly formatted
+        organizationName: formData.organizationName.trim(),
+        organizationLocation: formData.organizationLocation.trim(),
+        industry: formData.industry.trim(),
+        director: {
+          name: formData.director.name.trim(),
+          phone: formData.director.phone.trim(),
+          email: formData.director.email.trim()
+        },
+        liaison: {
+          name: formData.liaison.name.trim(),
+          phone: formData.liaison.phone.trim(),
+          email: formData.liaison.email.trim()
+        },
+        partnershipType: formData.partnershipType.trim(),
+        duration: formData.duration.trim()
       });
-      setCurrentStep(1);
-      setTimeout(() => setSubmitSuccess(false), 5000);
+
+      if (response.status === 201) {
+        setSubmitSuccess(true);
+        setFormData({
+          organizationName: "",
+          organizationLocation: "",
+          isLicensed: false,
+          industry: "",
+          director: { name: "", phone: "", email: "" },
+          liaison: { name: "", phone: "", email: "" },
+          partnershipType: "",
+          duration: "",
+          expectations: "",
+          ourOffer: "",
+          socialMedia: "",
+          licenseImage: "",
+          confirmation: false,
+        });
+        setCurrentStep(1);
+        setTimeout(() => setSubmitSuccess(false), 5000);
+      }
     } catch (error) {
-      console.error(error);
-      alert(
-        "حدث خطأ أثناء التسجيل: " +
-          (error.response?.data?.message || "خطأ غير معروف")
-      );
+      console.error("Submission error:", error);
+      const errorMessage = error.response?.data?.message || "حدث خطأ أثناء التسجيل";
+      setFormErrors(prev => ({
+        ...prev,
+        submit: errorMessage
+      }));
     } finally {
       setLoading(false);
     }
