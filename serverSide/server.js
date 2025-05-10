@@ -3,6 +3,24 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
+
+const cron = require('node-cron');
+const Subscriber = require('./models/subscriberModel');
+const sgMail = require('@sendgrid/mail');
+const subscriberRoutes = require('./routes/subscriberRoutes');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+cron.schedule('0 9 * * 1', async () => {
+  console.log('⏰ إرسال النشرة الأسبوعية');
+  const subs = await Subscriber.find().lean();
+  const html = '<h1>آخر الأخبار</h1><p>هنا تفاصيل التحديثات …</p>';
+
+  subs.forEach(({ email }) => {
+    sgMail.send({ to: email, from: process.env.EMAIL_FROM, subject: 'النشرة الأسبوعية', html })
+      .catch(e => console.error(`Failed ${email}:`, e.message));
+  });
+}, { timezone: 'Asia/Amman' });
+
 const connectDB = require('./config/db');
 
 const app = express();
@@ -14,7 +32,9 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/users', userRoutes);
+app.use('/api/add', subscriberRoutes);
+
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
 });
