@@ -2,6 +2,9 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const userRoutes = require("./routes/userRoutes");
+const newsRoutes = require("./routes/newsRoutes");
+const connectDB = require("./config/db");
 
 const cron = require("node-cron");
 const Subscriber = require("./models/subscriberModel");
@@ -49,6 +52,11 @@ app.use(cors());
 
 connectDB();
 
+app.use(cors());
+app.use(express.json());
+
+app.use("/api/users", userRoutes);
+app.use("/api/news", newsRoutes);
 app.use("/api", volunteerRoutes);
 app.use("/api", trainerRoutes);
 app.use("/api", traineeRoutes);

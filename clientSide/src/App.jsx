@@ -8,9 +8,10 @@ import PartnerForm from "./components/joinUs/PartnerForm";
 import IndividualPartnerForm from "./components/joinUs/IndividualPartnerForm";
 import JoinUsOptions from "./components/joinUs/JoinUsOptions";
 import TermsPage from "./components/joinUs/TermsPage";
-import HomePage from './components/HomePage/Home'
-import Footer from './components/Footer'
-import Navbar from './components/Navbar'
+import HomePage from "./components/HomePage/Home";
+import Footer from "./components/Footer";
+import Navbar from "./components/Navbar";
+import News from "./components/NewsEvents/News";
 
 const App = () => {
   return (
@@ -25,7 +26,11 @@ const App = () => {
             <Route path="/join-us/trainer" element={<TrainerForm />} />
             <Route path="/join-us/trainee" element={<TraineeForm />} />
             <Route path="/join-us/partner" element={<PartnerForm />} />
-            <Route path="/join-us/individual" element={<IndividualPartnerForm />} />
+            <Route
+              path="/join-us/individual"
+              element={<IndividualPartnerForm />}
+            />
+            <Route path="/news" element={<News />} />
             <Route path="/" element={<HomePage />} />
           </Routes>
         </main>
