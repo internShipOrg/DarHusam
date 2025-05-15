@@ -12,6 +12,7 @@ import HomePage from "./components/HomePage/Home";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import News from "./components/NewsEvents/News";
+import SuccessStories from "./components/SuccessStories";
 
 const App = () => {
   return (
@@ -32,6 +33,7 @@ const App = () => {
             />
             <Route path="/news" element={<News />} />
             <Route path="/" element={<HomePage />} />
+            <Route path="/success" element={<SuccessStories />} />
           </Routes>
         </main>
         <Footer />

@@ -33,7 +33,7 @@ cron.schedule(
   { timezone: "Asia/Amman" }
 );
 
-const connectDB = require("./config/db");
+// const connectDB = require("./config/db");
 const volunteerRoutes = require("./routes/volunteerRoutes");
 const trainerRoutes = require("./routes/trainerRoutes");
 const traineeRoutes = require("./routes/traineeRoutes");
