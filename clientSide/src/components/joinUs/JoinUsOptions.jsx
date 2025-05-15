@@ -1,65 +1,138 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UserCircle, Users, GraduationCap, Briefcase, HeartHandshake } from 'lucide-react';
+import { UserCircle, Building2, GraduationCap, BookOpen, Heart } from 'lucide-react';
+import TermsAndConditions from './TermsAndConditions';
 
-const forms = [
-  {
-    name: 'شريك فردي',
-    type: 'individual',
-    icon: <UserCircle size={40} className="mx-auto text-[#780C28]" />,
-    desc: 'انضم كشريك فردي وكن جزءًا من التغيير المجتمعي.'
-  },
-  {
-    name: 'شريك مؤسسة',
-    type: 'partner',
-    icon: <Users size={40} className="mx-auto text-[#6E8E59]" />,
-    desc: 'سجّل مؤسستك كشريك في النجاح والتأثير.'
-  },
-  {
-    name: 'متدرب',
-    type: 'trainee',
-    icon: <GraduationCap size={40} className="mx-auto text-[#780C28]" />,
-    desc: 'ابدأ رحلتك التدريبية معنا.'
-  },
-  {
-    name: 'مدرب',
-    type: 'trainer',
-    icon: <Briefcase size={40} className="mx-auto text-[#6E8E59]" />,
-    desc: 'ساهم بخبرتك كمدرب في تطوير الآخرين.'
-  },
-  {
-    name: 'متطوع',
-    type: 'volunteer',
-    icon: <HeartHandshake size={40} className="mx-auto text-[#780C28]" />,
-    desc: 'شارك بوقتك وجهدك كمتطوع.'
-  },
-];
+const formsPaths = {
+  individual: '/join-us/individual',
+  partner: '/join-us/partner',
+  trainee: '/join-us/trainee',
+  trainer: '/join-us/trainer',
+  volunteer: '/join-us/volunteer',
+};
+
+const formsTitles = {
+  individual: 'شريك فردي',
+  partner: 'شريك مؤسسة',
+  trainee: 'متدرب',
+  trainer: 'مدرب',
+  volunteer: 'متطوع',
+};
 
 const JoinUsOptions = () => {
   const navigate = useNavigate();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedType, setSelectedType] = useState(null);
+  const [agreed, setAgreed] = useState(false);
+
+  const options = [
+    {
+      title: 'شريك فردي',
+      description: 'انضم إلينا كشريك فردي وساهم في دعم رسالتنا',
+      icon: <UserCircle size={24} className="text-[#780C28]" />,
+      type: 'individual',
+    },
+    {
+      title: 'شريك مؤسسة',
+      description: 'تعاون معنا كشريك مؤسسة وكن جزءاً من نجاحنا',
+      icon: <Building2 size={24} className="text-[#780C28]" />,
+      type: 'partner',
+    },
+    {
+      title: 'متدرب',
+      description: 'تدرب معنا واكتسب خبرات جديدة في مجالك',
+      icon: <GraduationCap size={24} className="text-[#780C28]" />,
+      type: 'trainee',
+    },
+    {
+      title: 'مدرب',
+      description: 'شارك خبراتك مع الآخرين كمدرب محترف',
+      icon: <BookOpen size={24} className="text-[#780C28]" />,
+      type: 'trainer',
+    },
+    {
+      title: 'متطوع',
+      description: 'تطوع معنا وساهم في خدمة المجتمع',
+      icon: <Heart size={24} className="text-[#780C28]" />,
+      type: 'volunteer',
+    },
+  ];
+
+  const handleOptionClick = (type) => {
+    setSelectedType(type);
+    setAgreed(false);
+    setModalOpen(true);
+  };
+
+  const handleAgree = () => {
+    setModalOpen(false);
+    navigate(formsPaths[selectedType]);
+  };
+
+  // Map 'individual' to 'individualPartner' for TermsAndConditions
+  const termsType = selectedType === 'individual' ? 'individualPartner' : selectedType;
+
   return (
     <div className="bg-gray-50 min-h-screen py-12" dir="rtl">
       <div className="container mx-auto px-4">
-        <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="bg-gradient-to-l from-[#780C28] to-[#6E8E59] py-8 px-8 text-white text-center">
-            <h1 className="text-3xl font-bold mb-2">انضم إلينا</h1>
-            <p className="text-white/80 text-lg">اختر نوع التسجيل المناسب لك</p>
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h1 className="text-3xl font-bold text-[#780C28] mb-4">انضم إلينا</h1>
+            <p className="text-gray-600">اختر الطريقة التي تريد بها الانضمام إلى دار حصام</p>
           </div>
-          <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-            {forms.map((form) => (
-              <button
-                key={form.type}
-                onClick={() => navigate(`/join-us/${form.type}/terms`)}
-                className="bg-gray-100 hover:bg-[#f3e8ee] border border-gray-200 rounded-lg p-6 flex flex-col items-center shadow transition-all duration-200 focus:outline-none"
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {options.map((option, index) => (
+              <div
+                key={index}
+                onClick={() => handleOptionClick(option.type)}
+                className="bg-white rounded-lg shadow-md p-6 cursor-pointer transition-all duration-300 hover:shadow-lg hover:border-[#780C28] border-2 border-transparent"
               >
-                {form.icon}
-                <span className="mt-4 text-lg font-semibold text-[#780C28]">{form.name}</span>
-                <span className="mt-2 text-gray-600 text-sm text-center">{form.desc}</span>
-              </button>
+                <div className="flex items-center mb-4">
+                  {option.icon}
+                  <h2 className="text-xl font-bold text-[#780C28] mr-3">{option.title}</h2>
+                </div>
+                <p className="text-gray-600">{option.description}</p>
+              </div>
             ))}
           </div>
         </div>
       </div>
+
+      {/* Modal */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full p-6 relative animate-fadeIn" dir="rtl">
+            <button
+              className="absolute left-4 top-4 text-gray-400 hover:text-[#780C28] text-2xl font-bold"
+              onClick={() => setModalOpen(false)}
+              aria-label="إغلاق"
+            >
+              ×
+            </button>
+            <h2 className="text-2xl font-bold text-[#780C28] mb-6 text-center">الشروط والأحكام - {formsTitles[selectedType]}</h2>
+            <div className="max-h-[50vh] overflow-y-auto mb-6 pr-2">
+              <TermsAndConditions type={termsType} />
+            </div>
+            <div className="flex items-center mb-6">
+              <input
+                type="checkbox"
+                id="agree"
+                checked={agreed}
+                onChange={e => setAgreed(e.target.checked)}
+                className="w-4 h-4 border-gray-300 rounded focus:ring-[#780C28] text-[#780C28]"
+              />
+              <label htmlFor="agree" className="mr-2 text-sm">أوافق على جميع الشروط والأحكام</label>
+            </div>
+            <button
+              onClick={handleAgree}
+              disabled={!agreed}
+              className="w-full bg-[#780C28] text-white py-3 rounded-lg font-medium text-lg transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              أوافق وأكمل التسجيل
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
