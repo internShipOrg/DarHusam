@@ -1,78 +1,6 @@
-// // clientSide/src/components/TrainerForm.jsx
-// import React, { useState } from "react";
-// import axios from "axios";
-
-// const TrainerForm = () => {
-//   const [formData, setFormData] = useState({
-//     fullName: "",
-//     nationalID: "",
-//     phone: "",
-//     alternatePhone: "",
-//     email: "",
-//     residence: "",
-//     educationField: "",
-//     trainingField: "",
-//     experienceYears: "",
-//     referees: [{ name: "", phone: "", email: "", position: "", residence: "" }],
-//     confirmation: false,
-//   });
-
-//   const handleChange = (e) => {
-//     const { name, value, type, checked } = e.target;
-//     setFormData({
-//       ...formData,
-//       [name]: type === "checkbox" ? checked : value,
-//     });
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-
-//     if (!formData.confirmation) {
-//       alert("يرجى تأكيد صحة المعلومات.");
-//       return;
-//     }
-
-//     try {
-//       await axios.post("http://localhost:5000/api/trainers", formData);
-//       alert("تم التسجيل كمدرب بنجاح!");
-//     } catch (error) {
-//       console.error(error);
-//       alert("حدث خطأ أثناء التسجيل: " + (error.response?.data?.message || "Unknown error"));
-//     }
-//   };
-
-//   return (
-//     <div className="max-w-md mx-auto mt-10 p-5 shadow-lg bg-white rounded-lg">
-//       <h2 className="text-2xl font-bold mb-4">كن مدربًا</h2>
-//       <form onSubmit={handleSubmit}>
-//         <input type="text" name="fullName" placeholder="الاسم الرباعي" onChange={handleChange} required className="block w-full p-2 mb-3 border" />
-//         <input type="text" name="nationalID" placeholder="الرقم الوطني" onChange={handleChange} required className="block w-full p-2 mb-3 border" />
-//         <input type="text" name="phone" placeholder="رقم الهاتف" onChange={handleChange} required className="block w-full p-2 mb-3 border" />
-//         <input type="email" name="email" placeholder="البريد الإلكتروني" onChange={handleChange} required className="block w-full p-2 mb-3 border" />
-//         <input type="text" name="residence" placeholder="مكان السكن" onChange={handleChange} required className="block w-full p-2 mb-3 border" />
-//         <input type="text" name="educationField" placeholder="التخصص الدراسي" onChange={handleChange} required className="block w-full p-2 mb-3 border" />
-//         <input type="text" name="trainingField" placeholder="مجال التدريب" onChange={handleChange} required className="block w-full p-2 mb-3 border" />
-//         <select name="experienceYears" onChange={handleChange} required className="block w-full p-2 mb-3 border">
-//           <option value="">عدد سنوات الخبرة كمدرب</option>
-//           <option value="0">0</option>
-//           <option value="6 اشهر-سنة">6 اشهر-سنة</option>
-//           <option value="سنة – 3 سنوات">سنة – 3 سنوات</option>
-//           <option value="اكثر من 3 سنوات">اكثر من 3 سنوات</option>
-//         </select>
-//         <input type="checkbox" name="confirmation" onChange={handleChange} /> <label>أقر أن جميع المعلومات صحيحة</label>
-//         <button type="submit" className="bg-blue-500 text-white p-2 rounded mt-3">تسجيل</button>
-//       </form>
-//     </div>
-//   );
-// };
-
-// export default TrainerForm;
-
-
-
 import React, { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const TrainerForm = () => {
   const [formData, setFormData] = useState({
@@ -91,7 +19,6 @@ const TrainerForm = () => {
 
   const [loading, setLoading] = useState(false);
   const [formErrors, setFormErrors] = useState({});
-  const [submitSuccess, setSubmitSuccess] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 3;
 
@@ -133,7 +60,6 @@ const TrainerForm = () => {
       [name]: type === "checkbox" ? checked : value,
     });
 
-    // مسح رسائل الخطأ عند التعديل
     if (formErrors[name]) {
       setFormErrors({
         ...formErrors,
@@ -207,7 +133,7 @@ const TrainerForm = () => {
 
     try {
       await axios.post("http://localhost:5000/api/trainers", formData);
-      setSubmitSuccess(true);
+      toast.success("تم تسجيل طلب التدريب بنجاح! سيتم التواصل معك قريباً.");
       setFormData({
         fullName: "",
         nationalID: "",
@@ -222,16 +148,20 @@ const TrainerForm = () => {
         confirmation: false,
       });
       setCurrentStep(1);
-      setTimeout(() => setSubmitSuccess(false), 5000);
     } catch (error) {
       console.error(error);
-      alert(
-        "حدث خطأ أثناء التسجيل: " +
-          (error.response?.data?.message || "خطأ غير معروف")
-      );
+      toast.error(error.response?.data?.message || "حدث خطأ أثناء التسجيل");
     } finally {
       setLoading(false);
     }
+  };
+
+  const getInputClass = (fieldName) => {
+    return `w-full px-4 py-3 rounded-lg border text-[#780C28] bg-white ${
+      formErrors[fieldName]
+        ? 'border-red-500 focus:ring-red-500'
+        : 'border-gray-300 focus:border-[#780C28] focus:ring-[#780C28]'
+    } focus:ring-2 transition-all duration-300 outline-none`;
   };
 
   const renderStepIndicator = () => {
@@ -242,7 +172,7 @@ const TrainerForm = () => {
             <div
               className={`flex items-center justify-center w-10 h-10 rounded-full ${
                 index + 1 === currentStep
-                  ? "bg-indigo-600 text-white"
+                  ? "bg-[#780C28] text-white"
                   : index + 1 < currentStep
                   ? "bg-green-500 text-white"
                   : "bg-gray-200 text-gray-600"
@@ -270,7 +200,7 @@ const TrainerForm = () => {
             <div
               className={`mt-2 text-xs font-medium ${
                 index + 1 === currentStep
-                  ? "text-indigo-600"
+                  ? "text-[#780C28]"
                   : index + 1 < currentStep
                   ? "text-green-500"
                   : "text-gray-500"
@@ -289,318 +219,171 @@ const TrainerForm = () => {
   };
 
   return (
-    <div
-      className="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen py-12 px-4 sm:px-6 lg:px-8 font-sans"
-      dir="rtl"
-    >
-      <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-700 py-6">
-          <h2 className="text-3xl font-bold text-white text-center">
-            كن مدربًا معنا
-          </h2>
-          <p className="text-indigo-100 text-center mt-2">
-            انضم لفريق المدربين وشارك خبراتك مع الآخرين
-          </p>
-        </div>
-
-        {submitSuccess && (
-          <div className="bg-green-50 border-r-4 border-green-500 p-4 m-4">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <svg
-                  className="h-5 w-5 text-green-500"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <div className="mr-3">
-                <p className="text-sm text-green-800">
-                  تم تسجيل طلب التدريب بنجاح! سيتم التواصل معك قريباً.
-                </p>
-              </div>
-            </div>
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="container mx-auto px-4">
+        <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="bg-[#780C28] px-8 py-6 text-white text-center">
+            <h1 className="text-2xl font-bold">كن مدربًا معنا</h1>
+            <p className="mt-2">انضم لفريق المدربين وشارك خبراتك مع الآخرين</p>
           </div>
-        )}
 
-        {Object.keys(formErrors).length > 0 && (
-          <div className="bg-red-50 border-r-4 border-red-500 p-4 m-4">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <svg
-                  className="h-5 w-5 text-red-500"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <div className="mr-3">
-                <p className="text-sm text-red-800">
-                  يرجى تصحيح الأخطاء في النموذج
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+          <div className="p-6">
+            {renderStepIndicator()}
 
-        <div className="p-6">
-          {renderStepIndicator()}
+            <form onSubmit={handleSubmit} dir="rtl">
+              {currentStep === 1 && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[#780C28] font-medium mb-1">
+                        الاسم الرباعي <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="fullName"
+                        value={formData.fullName}
+                        onChange={handleChange}
+                        className={getInputClass("fullName")}
+                        placeholder="أدخل اسمك الرباعي"
+                      />
+                      {formErrors.fullName && (
+                        <p className="text-red-500 text-sm mt-1">{formErrors.fullName}</p>
+                      )}
+                    </div>
 
-          <form onSubmit={handleSubmit}>
-            {currentStep === 1 && (
-              <div className="space-y-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                  المعلومات الشخصية
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label
-                      htmlFor="fullName"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      الاسم الرباعي <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="fullName"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleChange}
-                      className={`block w-full p-3 border ${
-                        formErrors.fullName
-                          ? "border-red-500 bg-red-50"
-                          : "border-gray-300"
-                      } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition`}
-                      placeholder="أدخل اسمك الرباعي"
-                    />
-                    {formErrors.fullName && (
-                      <p className="mt-1 text-sm text-red-600">{formErrors.fullName}</p>
-                    )}
-                  </div>
+                    <div>
+                      <label className="block text-[#780C28] font-medium mb-1">
+                        الرقم الوطني <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="nationalID"
+                        value={formData.nationalID}
+                        onChange={handleChange}
+                        className={getInputClass("nationalID")}
+                        placeholder="0000000000"
+                      />
+                      {formErrors.nationalID && (
+                        <p className="text-red-500 text-sm mt-1">{formErrors.nationalID}</p>
+                      )}
+                    </div>
 
-                  <div>
-                    <label
-                      htmlFor="nationalID"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      الرقم الوطني <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="nationalID"
-                      name="nationalID"
-                      value={formData.nationalID}
-                      onChange={handleChange}
-                      className={`block w-full p-3 border ${
-                        formErrors.nationalID
-                          ? "border-red-500 bg-red-50"
-                          : "border-gray-300"
-                      } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition`}
-                      placeholder="0000000000"
-                    />
-                    {formErrors.nationalID && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {formErrors.nationalID}
-                      </p>
-                    )}
-                  </div>
+                    <div>
+                      <label className="block text-[#780C28] font-medium mb-1">
+                        رقم الهاتف <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className={getInputClass("phone")}
+                        placeholder="07xxxxxxxx"
+                      />
+                      {formErrors.phone && (
+                        <p className="text-red-500 text-sm mt-1">{formErrors.phone}</p>
+                      )}
+                    </div>
 
-                  <div>
-                    <label
-                      htmlFor="phone"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      رقم الهاتف <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className={`block w-full p-3 border ${
-                        formErrors.phone
-                          ? "border-red-500 bg-red-50"
-                          : "border-gray-300"
-                      } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition`}
-                      placeholder="07xxxxxxxx"
-                    />
-                    {formErrors.phone && (
-                      <p className="mt-1 text-sm text-red-600">{formErrors.phone}</p>
-                    )}
-                  </div>
+                    <div>
+                      <label className="block text-[#780C28] font-medium mb-1">
+                        رقم هاتف بديل
+                      </label>
+                      <input
+                        type="text"
+                        name="alternatePhone"
+                        value={formData.alternatePhone}
+                        onChange={handleChange}
+                        className={getInputClass("alternatePhone")}
+                        placeholder="07xxxxxxxx (اختياري)"
+                      />
+                      {formErrors.alternatePhone && (
+                        <p className="text-red-500 text-sm mt-1">{formErrors.alternatePhone}</p>
+                      )}
+                    </div>
 
-                  <div>
-                    <label
-                      htmlFor="alternatePhone"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      رقم هاتف بديل
-                    </label>
-                    <input
-                      type="text"
-                      id="alternatePhone"
-                      name="alternatePhone"
-                      value={formData.alternatePhone}
-                      onChange={handleChange}
-                      className={`block w-full p-3 border ${
-                        formErrors.alternatePhone
-                          ? "border-red-500 bg-red-50"
-                          : "border-gray-300"
-                      } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition`}
-                      placeholder="07xxxxxxxx (اختياري)"
-                    />
-                    {formErrors.alternatePhone && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {formErrors.alternatePhone}
-                      </p>
-                    )}
-                  </div>
+                    <div>
+                      <label className="block text-[#780C28] font-medium mb-1">
+                        البريد الإلكتروني <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className={getInputClass("email")}
+                        placeholder="example@domain.com"
+                      />
+                      {formErrors.email && (
+                        <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>
+                      )}
+                    </div>
 
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      البريد الإلكتروني <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className={`block w-full p-3 border ${
-                        formErrors.email
-                          ? "border-red-500 bg-red-50"
-                          : "border-gray-300"
-                      } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition`}
-                      placeholder="example@domain.com"
-                    />
-                    {formErrors.email && (
-                      <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="residence"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      مكان السكن <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="residence"
-                      name="residence"
-                      value={formData.residence}
-                      onChange={handleChange}
-                      className={`block w-full p-3 border ${
-                        formErrors.residence
-                          ? "border-red-500 bg-red-50"
-                          : "border-gray-300"
-                      } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition`}
-                      placeholder="المحافظة / المنطقة"
-                    />
-                    {formErrors.residence && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {formErrors.residence}
-                      </p>
-                    )}
+                    <div>
+                      <label className="block text-[#780C28] font-medium mb-1">
+                        مكان السكن <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="residence"
+                        value={formData.residence}
+                        onChange={handleChange}
+                        className={getInputClass("residence")}
+                        placeholder="المحافظة / المنطقة"
+                      />
+                      {formErrors.residence && (
+                        <p className="text-red-500 text-sm mt-1">{formErrors.residence}</p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {currentStep === 2 && (
-              <div className="space-y-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                  المؤهلات والخبرات
-                </h3>
-                <div className="grid grid-cols-1 gap-6">
+              {currentStep === 2 && (
+                <div className="space-y-4">
                   <div>
-                    <label
-                      htmlFor="educationField"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
+                    <label className="block text-[#780C28] font-medium mb-1">
                       التخصص الدراسي <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
-                      id="educationField"
                       name="educationField"
                       value={formData.educationField}
                       onChange={handleChange}
-                      className={`block w-full p-3 border ${
-                        formErrors.educationField
-                          ? "border-red-500 bg-red-50"
-                          : "border-gray-300"
-                      } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition`}
+                      className={getInputClass("educationField")}
                       placeholder="أدخل تخصصك الدراسي"
                     />
                     {formErrors.educationField && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {formErrors.educationField}
-                      </p>
+                      <p className="text-red-500 text-sm mt-1">{formErrors.educationField}</p>
                     )}
                   </div>
 
                   <div>
-                    <label
-                      htmlFor="trainingField"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
+                    <label className="block text-[#780C28] font-medium mb-1">
                       مجال التدريب <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
-                      id="trainingField"
                       name="trainingField"
                       value={formData.trainingField}
                       onChange={handleChange}
-                      className={`block w-full p-3 border ${
-                        formErrors.trainingField
-                          ? "border-red-500 bg-red-50"
-                          : "border-gray-300"
-                      } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition`}
+                      className={getInputClass("trainingField")}
                       placeholder="المجال الذي ترغب بالتدريب فيه"
                     />
                     {formErrors.trainingField && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {formErrors.trainingField}
-                      </p>
+                      <p className="text-red-500 text-sm mt-1">{formErrors.trainingField}</p>
                     )}
                   </div>
 
                   <div>
-                    <label
-                      htmlFor="experienceYears"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
+                    <label className="block text-[#780C28] font-medium mb-1">
                       سنوات الخبرة <span className="text-red-500">*</span>
                     </label>
                     <select
-                      id="experienceYears"
                       name="experienceYears"
                       value={formData.experienceYears}
                       onChange={handleChange}
-                      className={`block w-full p-3 border ${
-                        formErrors.experienceYears
-                          ? "border-red-500 bg-red-50"
-                          : "border-gray-300"
-                      } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition`}
+                      className={getInputClass("experienceYears")}
                     >
                       <option value="">عدد سنوات الخبرة كمدرب</option>
                       <option value="0">لا توجد خبرة سابقة</option>
@@ -609,157 +392,133 @@ const TrainerForm = () => {
                       <option value="اكثر من 3 سنوات">أكثر من 3 سنوات</option>
                     </select>
                     {formErrors.experienceYears && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {formErrors.experienceYears}
-                      </p>
+                      <p className="text-red-500 text-sm mt-1">{formErrors.experienceYears}</p>
                     )}
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {currentStep === 3 && (
-              <div className="space-y-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                  المراجع (اختياري)
-                </h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  يمكنك إضافة حتى 3 مراجع يمكن الرجوع إليهم للاستفسار عن خبراتك السابقة
-                </p>
+              {currentStep === 3 && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-[#780C28] mb-2">
+                    المراجع (اختياري)
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    يمكنك إضافة حتى 3 مراجع يمكن الرجوع إليهم للاستفسار عن خبراتك السابقة
+                  </p>
 
-                {formData.referees.map((referee, index) => (
-                  <div
-                    key={index}
-                    className="border border-gray-200 rounded-lg p-4 mb-6"
-                  >
-                    <div className="flex justify-between items-center mb-4">
-                      <h4 className="font-medium text-indigo-700">
-                        المرجع {index + 1}
-                      </h4>
-                      {formData.referees.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeReferee(index)}
-                          className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
+                  {formData.referees.map((referee, index) => (
+                    <div
+                      key={index}
+                      className="border border-[#780C28]/20 rounded-lg p-4 mb-4"
+                    >
+                      <div className="flex justify-between items-center mb-3">
+                        <h4 className="font-medium text-[#780C28]">
+                          المرجع {index + 1}
+                        </h4>
+                        {formData.referees.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeReferee(index)}
+                            className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition"
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                            />
-                          </svg>
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label
-                          htmlFor={`referee-name-${index}`}
-                          className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                          الاسم
-                        </label>
-                        <input
-                          type="text"
-                          id={`referee-name-${index}`}
-                          name="name"
-                          value={referee.name}
-                          onChange={(e) => handleRefereeChange(index, e)}
-                          className="block w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                          placeholder="اسم المرجع"
-                        />
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                              />
+                            </svg>
+                          </button>
+                        )}
                       </div>
 
-                      <div>
-                        <label
-                          htmlFor={`referee-phone-${index}`}
-                          className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                          رقم الهاتف
-                        </label>
-                        <input
-                          type="text"
-                          id={`referee-phone-${index}`}
-                          name="phone"
-                          value={referee.phone}
-                          onChange={(e) => handleRefereeChange(index, e)}
-                          className="block w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                          placeholder="رقم هاتف المرجع"
-                        />
-                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[#780C28] text-sm mb-1">
+                            الاسم
+                          </label>
+                          <input
+                            type="text"
+                            name="name"
+                            value={referee.name}
+                            onChange={(e) => handleRefereeChange(index, e)}
+                            className={getInputClass(`referee-name-${index}`)}
+                            placeholder="اسم المرجع"
+                          />
+                        </div>
 
-                      <div>
-                        <label
-                          htmlFor={`referee-email-${index}`}
-                          className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                          البريد الإلكتروني
-                        </label>
-                        <input
-                          type="email"
-                          id={`referee-email-${index}`}
-                          name="email"
-                          value={referee.email}
-                          onChange={(e) => handleRefereeChange(index, e)}
-                          className="block w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                          placeholder="البريد الإلكتروني للمرجع"
-                        />
-                      </div>
+                        <div>
+                          <label className="block text-[#780C28] text-sm mb-1">
+                            رقم الهاتف
+                          </label>
+                          <input
+                            type="text"
+                            name="phone"
+                            value={referee.phone}
+                            onChange={(e) => handleRefereeChange(index, e)}
+                            className={getInputClass(`referee-phone-${index}`)}
+                            placeholder="رقم هاتف المرجع"
+                          />
+                        </div>
 
-                      <div>
-                        <label
-                          htmlFor={`referee-position-${index}`}
-                          className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                          المسمى الوظيفي
-                        </label>
-                        <input
-                          type="text"
-                          id={`referee-position-${index}`}
-                          name="position"
-                          value={referee.position}
-                          onChange={(e) => handleRefereeChange(index, e)}
-                          className="block w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                          placeholder="المسمى الوظيفي للمرجع"
-                        />
-                      </div>
+                        <div>
+                          <label className="block text-[#780C28] text-sm mb-1">
+                            البريد الإلكتروني
+                          </label>
+                          <input
+                            type="email"
+                            name="email"
+                            value={referee.email}
+                            onChange={(e) => handleRefereeChange(index, e)}
+                            className={getInputClass(`referee-email-${index}`)}
+                            placeholder="البريد الإلكتروني للمرجع"
+                          />
+                        </div>
 
-                      <div>
-                        <label
-                          htmlFor={`referee-residence-${index}`}
-                          className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                          مكان العمل
-                        </label>
-                        <input
-                          type="text"
-                          id={`referee-residence-${index}`}
-                          name="residence"
-                          value={referee.residence}
-                          onChange={(e) => handleRefereeChange(index, e)}
-                          className="block w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                          placeholder="مكان عمل المرجع"
-                        />
+                        <div>
+                          <label className="block text-[#780C28] text-sm mb-1">
+                            المسمى الوظيفي
+                          </label>
+                          <input
+                            type="text"
+                            name="position"
+                            value={referee.position}
+                            onChange={(e) => handleRefereeChange(index, e)}
+                            className={getInputClass(`referee-position-${index}`)}
+                            placeholder="المسمى الوظيفي للمرجع"
+                          />
+                        </div>
+
+                        <div className="md:col-span-2">
+                          <label className="block text-[#780C28] text-sm mb-1">
+                            مكان العمل
+                          </label>
+                          <input
+                            type="text"
+                            name="residence"
+                            value={referee.residence}
+                            onChange={(e) => handleRefereeChange(index, e)}
+                            className={getInputClass(`referee-residence-${index}`)}
+                            placeholder="مكان عمل المرجع"
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
 
-                {formData.referees.length < 3 && (
-                  <div className="flex justify-center">
+                  {formData.referees.length < 3 && (
                     <button
                       type="button"
                       onClick={addReferee}
-                      className="flex items-center text-indigo-600 hover:text-indigo-800"
+                      className="flex items-center text-[#780C28] hover:text-[#5e0a20] text-sm"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -777,101 +536,93 @@ const TrainerForm = () => {
                       </svg>
                       إضافة مرجع جديد
                     </button>
-                  </div>
-                )}
-
-                <div className="mt-6 pt-4 border-t border-gray-200">
-                  <div className="flex items-center mb-4">
-                    <input
-                      id="confirmation"
-                      name="confirmation"
-                      type="checkbox"
-                      checked={formData.confirmation}
-                      onChange={handleChange}
-                      className={`h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded ${
-                        formErrors.confirmation
-                          ? "border-red-500"
-                          : ""
-                      }`}
-                    />
-                    <label
-                      htmlFor="confirmation"
-                      className="mr-2 block text-sm text-gray-700"
-                    >
-                      أقر أن جميع المعلومات المقدمة صحيحة ودقيقة
-                    </label>
-                  </div>
-                  {formErrors.confirmation && (
-                    <p className="mt-1 text-sm text-red-600 mb-4">
-                      {formErrors.confirmation}
-                    </p>
                   )}
+
+                  <div className="mt-4 pt-3 border-t border-gray-200">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        name="confirmation"
+                        checked={formData.confirmation}
+                        onChange={handleChange}
+                        className={`w-4 h-4 text-[#780C28] border-gray-300 rounded focus:ring-[#780C28] ${
+                          formErrors.confirmation ? 'border-red-500' : ''
+                        }`}
+                      />
+                      <label className="text-[#780C28] text-sm">
+                        أقر أن جميع المعلومات المقدمة صحيحة ودقيقة
+                        <span className="text-red-500"> *</span>
+                      </label>
+                    </div>
+                    {formErrors.confirmation && (
+                      <p className="text-red-500 text-sm mt-1">{formErrors.confirmation}</p>
+                    )}
+                  </div>
                 </div>
+              )}
+
+              <div className="flex justify-between mt-6">
+                {currentStep > 1 && (
+                  <button
+                    type="button"
+                    onClick={prevStep}
+                    className="px-4 py-2 border border-[#780C28] rounded-lg text-sm font-medium text-[#780C28] bg-white hover:bg-[#780C28]/10 transition"
+                  >
+                    السابق
+                  </button>
+                )}
+                {currentStep < totalSteps ? (
+                  <button
+                    type="button"
+                    onClick={nextStep}
+                    className="px-6 py-2 bg-[#780C28] text-white rounded-lg text-sm font-medium hover:bg-[#5e0a20] transition"
+                  >
+                    التالي
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className={`px-6 py-2 bg-[#780C28] text-white rounded-lg text-sm font-medium hover:bg-[#5e0a20] transition ${
+                      loading ? "opacity-70 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    {loading ? (
+                      <span className="flex items-center justify-center">
+                        <svg
+                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        جاري التسجيل...
+                      </span>
+                    ) : (
+                      "تسجيل طلب التدريب"
+                    )}
+                  </button>
+                )}
               </div>
-            )}
+            </form>
 
-            <div className="flex justify-between mt-8">
-              {currentStep > 1 && (
-                <button
-                  type="button"
-                  onClick={prevStep}
-                  className="py-2 px-4 border border-indigo-300 rounded-lg shadow-sm text-md font-medium text-indigo-700 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition"
-                >
-                  السابق
-                </button>
-              )}
-              {currentStep < totalSteps ? (
-                <button
-                  type="button"
-                  onClick={nextStep}
-                  className="py-2 px-6 border border-transparent rounded-lg shadow-sm text-md font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition"
-                >
-                  التالي
-                </button>
-              ) : (
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className={`py-3 px-8 border border-transparent rounded-lg shadow-sm text-md font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition ${
-                    loading ? "opacity-70 cursor-not-allowed" : ""
-                  }`}
-                >
-                  {loading ? (
-                    <>
-                      <svg
-                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                      جاري التسجيل...
-                    </>
-                  ) : (
-                    "تسجيل طلب التدريب"
-                  )}
-                </button>
-              )}
-            </div>
-          </form>
-
-          <p className="text-xs text-gray-500 text-center mt-6">
-            الحقول المميزة بـ <span className="text-red-500">*</span> حقول
-            إلزامية
-          </p>
+            <p className="text-xs text-gray-500 text-center mt-4">
+              الحقول المميزة بـ <span className="text-red-500">*</span> حقول إلزامية
+            </p>
+          </div>
         </div>
       </div>
     </div>
