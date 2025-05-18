@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
+
 // Check for required environment variables
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET is not defined in environment variables');
@@ -15,6 +16,8 @@ const sgMail = require("@sendgrid/mail");
 const subscriberRoutes = require("./routes/subscriberRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+
+
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 cron.schedule(
@@ -44,6 +47,8 @@ const trainerRoutes = require("./routes/trainerRoutes");
 const traineeRoutes = require("./routes/traineeRoutes");
 const partnerRoutes = require("./routes/partnerRoutes");
 const individualPartnerRoutes = require("./routes/individualPartnerRoutes");
+const program = require("./routes/programRoutes")
+const registerRoutes = require("./routes/register");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -67,6 +72,8 @@ app.use("/api", individualPartnerRoutes);
 app.use("/api/add", subscriberRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/programs", program);
+app.use("/api/register", registerRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -81,4 +88,4 @@ app.use((err, req, res, next) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
-});
+});  
