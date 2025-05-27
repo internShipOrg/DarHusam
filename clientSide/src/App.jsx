@@ -17,6 +17,7 @@ import ContactUs from './pages/ContactUs';
 import AdminLogin from './pages/admin/Login';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminSetup from './pages/admin/Setup';
+import TrainingPrograms from './pages/TrainingPrograms';
 
 // Wrapper component to conditionally render Navbar and Footer
 const Layout = ({ children }) => {
@@ -39,6 +40,7 @@ const App = () => {
     <Router>
       <Layout>
         <Routes>
+          <Route path="/training-programs" element={<TrainingPrograms />} />
           <Route path="/join-us/terms/:type" element={<TermsPage />} />
           <Route path="/join-us" element={<JoinUsOptions />} />
           <Route path="/join-us/volunteer" element={<VolunteerForm />} />
