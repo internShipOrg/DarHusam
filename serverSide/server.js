@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const connectDB = require("./config/db");
 
 
 // Check for required environment variables
@@ -16,8 +17,7 @@ const sgMail = require("@sendgrid/mail");
 const subscriberRoutes = require("./routes/subscriberRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const adminRoutes = require("./routes/adminRoutes");
-
-
+const successStoryRoutes = require("./routes/successStoryRoutes");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 cron.schedule(
@@ -41,7 +41,7 @@ cron.schedule(
   { timezone: "Asia/Amman" }
 );
 
-const connectDB = require("./config/db");
+// const connectDB = require("./config/db");
 const volunteerRoutes = require("./routes/volunteerRoutes");
 const trainerRoutes = require("./routes/trainerRoutes");
 const traineeRoutes = require("./routes/traineeRoutes");
@@ -74,6 +74,7 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/programs", program);
 app.use("/api/register", registerRoutes);
+app.use("/api/success", successStoryRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
