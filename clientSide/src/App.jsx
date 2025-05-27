@@ -17,11 +17,8 @@ import ContactUs from './pages/ContactUs';
 import AdminLogin from './pages/admin/Login';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminSetup from './pages/admin/Setup';
-<<<<<<< HEAD
 import SuccessStories from './components/SuccessStories';
-=======
 import TrainingPrograms from './pages/TrainingPrograms';
->>>>>>> a6c024d251b94d59cc6e92c38c80e82b5ed470a9
 
 // Wrapper component to conditionally render Navbar and Footer
 const Layout = ({ children }) => {
