@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const connectDB = require("./config/db");
 
 // Check for required environment variables
 if (!process.env.JWT_SECRET) {
@@ -15,6 +16,7 @@ const sgMail = require("@sendgrid/mail");
 const subscriberRoutes = require("./routes/subscriberRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const successStoryRoutes = require("./routes/successStoryRoutes");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 cron.schedule(

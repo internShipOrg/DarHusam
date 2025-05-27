@@ -1,5 +1,4 @@
-// import SuccessStory from "../models/SuccessStory";
-import SuccessStory from "../models/SuccessStory.js";
+import SuccessStory from "../models/SuccessStorymodels.js";
 
 // Get all stories
 export const getSuccessStories = async (req, res) => {

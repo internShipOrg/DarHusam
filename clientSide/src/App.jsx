@@ -17,6 +17,7 @@ import ContactUs from './pages/ContactUs';
 import AdminLogin from './pages/admin/Login';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminSetup from './pages/admin/Setup';
+import SuccessStories from './components/SuccessStories';
 
 // Wrapper component to conditionally render Navbar and Footer
 const Layout = ({ children }) => {
@@ -45,13 +46,17 @@ const App = () => {
           <Route path="/join-us/trainer" element={<TrainerForm />} />
           <Route path="/join-us/trainee" element={<TraineeForm />} />
           <Route path="/join-us/partner" element={<PartnerForm />} />
-          <Route path="/join-us/individual" element={<IndividualPartnerForm />} />
+          <Route
+            path="/join-us/individual"
+            element={<IndividualPartnerForm />}
+          />
           <Route path="/news" element={<News />} />
           <Route path="/" element={<HomePage />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/admin/setup" element={<AdminSetup />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/success-stories" element={<SuccessStories />} />
         </Routes>
       </Layout>
     </Router>
