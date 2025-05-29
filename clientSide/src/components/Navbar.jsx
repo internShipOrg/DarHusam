@@ -14,8 +14,8 @@ function Navbar() {
     },
     { 
       name: 'برامج التدريب', 
-      path: '/programs',
-      hasDropdown: true
+      path: '/training-programs',
+      // hasDropdown: true
     },
     { name: 'الأخبار والفعاليات', path: '/news' },
     { name: 'قصص النجاح', path: '/success-stories' },

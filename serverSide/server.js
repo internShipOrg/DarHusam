@@ -3,9 +3,10 @@ const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const connectDB = require("./config/db");
 
 const newsRoutes = require("./routes/newsRoutes");
-const connectDB = require("./config/db");
+
 // Check for required environment variables
 if (!process.env.JWT_SECRET) {
   console.error("JWT_SECRET is not defined in environment variables");
@@ -18,6 +19,7 @@ const sgMail = require("@sendgrid/mail");
 const subscriberRoutes = require("./routes/subscriberRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const successStoryRoutes = require("./routes/successStoryRoutes");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 cron.schedule(
@@ -42,11 +44,14 @@ cron.schedule(
 );
 // Serve static files from the public directory
 
+// const connectDB = require("./config/db");
 const volunteerRoutes = require("./routes/volunteerRoutes");
 const trainerRoutes = require("./routes/trainerRoutes");
 const traineeRoutes = require("./routes/traineeRoutes");
 const partnerRoutes = require("./routes/partnerRoutes");
 const individualPartnerRoutes = require("./routes/individualPartnerRoutes");
+const program = require("./routes/programRoutes");
+const registerRoutes = require("./routes/register");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -75,6 +80,9 @@ app.use("/api", individualPartnerRoutes);
 app.use("/api/add", subscriberRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/programs", program);
+app.use("/api/register", registerRoutes);
+app.use("/api/success", successStoryRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
