@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const path = require("path");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
@@ -39,6 +40,7 @@ cron.schedule(
   },
   { timezone: "Asia/Amman" }
 );
+// Serve static files from the public directory
 
 const volunteerRoutes = require("./routes/volunteerRoutes");
 const trainerRoutes = require("./routes/trainerRoutes");
@@ -48,7 +50,8 @@ const individualPartnerRoutes = require("./routes/individualPartnerRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
+app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
+app.use(express.static(path.join(__dirname, "public")));
 // Increase payload limit to 10MB
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
