@@ -9,6 +9,16 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 // Configure storage
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, uploadDir);
+//   },
+//   filename: function (req, file, cb) {
+//     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+//     const ext = path.extname(file.originalname);
+//     cb(null, file.fieldname + "-" + uniqueSuffix + ext);
+//   },
+// });
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, uploadDir);
@@ -16,10 +26,10 @@ const storage = multer.diskStorage({
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + "-" + uniqueSuffix + ext);
+    // Ensure consistent filename format
+    cb(null, "image-" + uniqueSuffix + ext);
   },
 });
-
 // File filter
 const fileFilter = function (req, file, cb) {
   const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];

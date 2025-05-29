@@ -1,7 +1,12 @@
 // clientSide/src/App.jsx
 
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import VolunteerForm from "./components/joinUs/VolunteerForm";
 import TrainerForm from "./components/joinUs/TrainerForm";
 import TraineeForm from "./components/joinUs/TraineeForm";
@@ -13,25 +18,23 @@ import HomePage from "./components/HomePage/Home";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import News from "./components/NewsEvents/News";
-import ContactUs from './pages/ContactUs';
-import AdminLogin from './pages/admin/Login';
-import AdminDashboard from './pages/admin/Dashboard';
-import AdminSetup from './pages/admin/Setup';
-import SuccessStories from './components/SuccessStories';
-import TrainingPrograms from './pages/TrainingPrograms';
+import ContactUs from "./pages/ContactUs";
+import AdminLogin from "./pages/admin/Login";
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminSetup from "./pages/admin/Setup";
+import SuccessStories from "./components/SuccessStories";
+import TrainingPrograms from "./pages/TrainingPrograms";
 
 // Wrapper component to conditionally render Navbar and Footer
 const Layout = ({ children }) => {
   const location = useLocation();
-  const isAdminPage = location.pathname.startsWith('/admin');
+  const isAdminPage = location.pathname.startsWith("/admin");
 
   return (
     <div className="flex flex-col min-h-screen">
       {!isAdminPage && <Navbar />}
-      <main className="flex-grow">
-        {children}
-      </main>
-      {!isAdminPage && <Footer />}
+      <main className="flex-grow">{children}</main>
+      {/* {!isAdminPage && <Footer />} */}
     </div>
   );
 };
