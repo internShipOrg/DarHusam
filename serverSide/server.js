@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const connectDB = require("./config/db");
+
 
 // Check for required environment variables
 if (!process.env.JWT_SECRET) {
@@ -9,41 +11,22 @@ if (!process.env.JWT_SECRET) {
   process.exit(1);
 }
 
-const cron = require("node-cron");
-const Subscriber = require("./models/subscriberModel");
-const sgMail = require("@sendgrid/mail");
+
 const subscriberRoutes = require("./routes/subscriberRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const adminRoutes = require("./routes/adminRoutes");
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const successStoryRoutes = require("./routes/successStoryRoutes");
 
-cron.schedule(
-  "0 9 * * 1",
-  async () => {
-    console.log("⏰ إرسال النشرة الأسبوعية");
-    const subs = await Subscriber.find().lean();
-    const html = "<h1>آخر الأخبار</h1><p>هنا تفاصيل التحديثات …</p>";
 
-    subs.forEach(({ email }) => {
-      sgMail
-        .send({
-          to: email,
-          from: process.env.EMAIL_FROM,
-          subject: "النشرة الأسبوعية",
-          html,
-        })
-        .catch((e) => console.error(`Failed ${email}:`, e.message));
-    });
-  },
-  { timezone: "Asia/Amman" }
-);
-
-const connectDB = require("./config/db");
+// const connectDB = require("./config/db");
 const volunteerRoutes = require("./routes/volunteerRoutes");
 const trainerRoutes = require("./routes/trainerRoutes");
 const traineeRoutes = require("./routes/traineeRoutes");
 const partnerRoutes = require("./routes/partnerRoutes");
 const individualPartnerRoutes = require("./routes/individualPartnerRoutes");
+const program = require("./routes/programRoutes")
+const registerRoutes = require("./routes/register");
+const homeRoutes = require("./routes/homeRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -67,6 +50,11 @@ app.use("/api", individualPartnerRoutes);
 app.use("/api/add", subscriberRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/programs", program);
+app.use("/api/register", registerRoutes);
+app.use("/api/success", successStoryRoutes);
+app.use("/api/home", homeRoutes);
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -81,4 +69,4 @@ app.use((err, req, res, next) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
-});
+});  
