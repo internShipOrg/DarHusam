@@ -25,7 +25,8 @@ import AdminSetup from "./pages/admin/Setup";
 import SuccessStories from "./components/SuccessStories";
 import TrainingPrograms from "./pages/TrainingPrograms";
 import ResourceLibrary from './components/ResourceLibrary'
-
+import AboutUs from "./components/AboutUs";
+import BookingPage from "./pages/BookingPage";
 // Wrapper component to conditionally render Navbar and Footer
 const Layout = ({ children }) => {
   const location = useLocation();
@@ -61,6 +62,8 @@ const App = () => {
           <Route path="/resources" element={<ResourceLibrary />} />
 
           <Route path="/contact" element={<ContactUs />} />
+          <Route path="/AboutUS" element={<AboutUs />} />
+          <Route path="/BookingPage" element={<BookingPage />} />
           <Route path="/admin/setup" element={<AdminSetup />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />

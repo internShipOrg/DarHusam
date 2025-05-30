@@ -1,7 +1,5 @@
-
-
-import React, { useState, useEffect } from 'react';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Menu, X, ChevronDown } from "lucide-react";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,21 +7,21 @@ function Navbar() {
 
   const menuItems = [
     {
-      name: 'برامج التدريب',
-      path: '/training-programs'
+      name: "برامج التدريب",
+      path: "/training-programs",
     },
-    { name: 'الأخبار والفعاليات', path: '/news' },
-    { name: 'قصص النجاح', path: '/success-stories' },
-    { name: 'مكتبة الموارد', path: '/resources' },
+    { name: "الأخبار والفعاليات", path: "/news" },
+    { name: "قصص النجاح", path: "/success-stories" },
+    { name: "مكتبة الموارد", path: "/resources" },
     {
-      name: 'حولنا',
-      path: '#',
+      name: "حولنا",
+      path: "#",
       hasDropdown: true,
       dropdownItems: [
-        { name: 'من نحن', path: '/about' },
-        { name: 'اتصل بنا', path: '/contact' }
-      ]
-    }
+        { name: "من نحن", path: "/about" },
+        { name: "اتصل بنا", path: "/contact" },
+      ],
+    },
   ];
 
   const toggleDropdown = (index) => {
@@ -41,16 +39,19 @@ function Navbar() {
     };
 
     if (activeDropdown !== null) {
-      document.addEventListener('click', handleClickOutside);
+      document.addEventListener("click", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener("click", handleClickOutside);
     };
   }, [activeDropdown]);
 
   return (
-    <nav className="bg-white shadow-sm shadow-[#780C28] py-3 sticky top-0 z-50" dir="rtl">
+    <nav
+      className="bg-white shadow-sm shadow-[#780C28] py-3 sticky top-0 z-50"
+      dir="rtl"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo Section */}
@@ -80,8 +81,9 @@ function Navbar() {
                       {item.name}
                       <ChevronDown
                         size={16}
-                        className={`mr-1 transition-transform duration-200 ${activeDropdown === index ? 'transform rotate-180' : ''
-                          }`}
+                        className={`mr-1 transition-transform duration-200 ${
+                          activeDropdown === index ? "transform rotate-180" : ""
+                        }`}
                       />
                     </button>
                     {activeDropdown === index && (
@@ -151,8 +153,9 @@ function Navbar() {
                       <span>{item.name}</span>
                       <ChevronDown
                         size={16}
-                        className={`transition-transform duration-200 ${activeDropdown === index ? 'transform rotate-180' : ''
-                          }`}
+                        className={`transition-transform duration-200 ${
+                          activeDropdown === index ? "transform rotate-180" : ""
+                        }`}
                       />
                     </button>
                     {activeDropdown === index && (
