@@ -1,10 +1,11 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
-const successStorySchema = new mongoose.Schema(
+const SuccessStorySchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
+      trim: true,
     },
     imageUrl: {
       type: String,
@@ -13,13 +14,23 @@ const successStorySchema = new mongoose.Schema(
     shortStory: {
       type: String,
       required: true,
+      trim: true,
     },
     videoUrl: {
       type: String,
       required: true,
     },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-export default mongoose.model("SuccessStory", successStorySchema);
+const SuccessStory = mongoose.model("SuccessStory", SuccessStorySchema);
+
+module.exports = SuccessStory;
+

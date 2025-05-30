@@ -78,8 +78,9 @@ export default function InitiativeSlider() {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 py-8 font-sans" dir="rtl">
-      <h2 className="text-center text-3xl font-bold mb-10 text-[#780C28]">مبادراتنا</h2>
+    <div className="w-full max-w-6xl mx-auto px-4 py-8 " dir="rtl">
+      <h2 className="text-center text-4xl font-bold text-[#780C28]">مبادراتنا</h2>
+          <div className="h-1 w-24 bg-[#6E8E59] mx-auto mt-3 mb-5 rounded-full"></div>
 
       <div className="relative">
         <div className="overflow-hidden">
@@ -104,12 +105,12 @@ export default function InitiativeSlider() {
                       </p>
                     </div>
                     <div className="mt-4 flex justify-center">
-                      <button
+                      {/* <button
                         onClick={() => navigate(`/initiatives/${initiative.id}`)}
                         className="px-4 py-2 bg-[#6E8E59] text-white rounded-lg hover:bg-opacity-90 transition-all duration-300 text-sm font-medium"
                       >
                         المزيد من التفاصيل
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                 </div>
