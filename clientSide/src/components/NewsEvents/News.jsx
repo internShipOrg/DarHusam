@@ -813,7 +813,7 @@ export default function News() {
 
   return (
     <div
-      className="flex flex-col h-screen bg-gray-50"
+      className="flex flex-col h-screen bg-gray-50 overflow-hidden"
       style={{ direction: "rtl" }}
     >
       {/* Main Header */}

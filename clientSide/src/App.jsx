@@ -24,6 +24,7 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminSetup from "./pages/admin/Setup";
 import SuccessStories from "./components/SuccessStories";
 import TrainingPrograms from "./pages/TrainingPrograms";
+import ResourceLibrary from './components/ResourceLibrary'
 
 // Wrapper component to conditionally render Navbar and Footer
 const Layout = ({ children }) => {
@@ -57,6 +58,8 @@ const App = () => {
           />
           <Route path="/news" element={<News />} />
           <Route path="/" element={<HomePage />} />
+          <Route path="/resources" element={<ResourceLibrary />} />
+
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/admin/setup" element={<AdminSetup />} />
           <Route path="/admin/login" element={<AdminLogin />} />
@@ -64,6 +67,7 @@ const App = () => {
           <Route path="/success-stories" element={<SuccessStories />} />
         </Routes>
       </Layout>
+      <Footer/>
     </Router>
   );
 };

@@ -13,36 +13,12 @@ if (!process.env.JWT_SECRET) {
   process.exit(1);
 }
 
-const cron = require("node-cron");
-const Subscriber = require("./models/subscriberModel");
-const sgMail = require("@sendgrid/mail");
+
 const subscriberRoutes = require("./routes/subscriberRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const successStoryRoutes = require("./routes/successStoryRoutes");
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-cron.schedule(
-  "0 9 * * 1",
-  async () => {
-    console.log("⏰ إرسال النشرة الأسبوعية");
-    const subs = await Subscriber.find().lean();
-    const html = "<h1>آخر الأخبار</h1><p>هنا تفاصيل التحديثات …</p>";
-
-    subs.forEach(({ email }) => {
-      sgMail
-        .send({
-          to: email,
-          from: process.env.EMAIL_FROM,
-          subject: "النشرة الأسبوعية",
-          html,
-        })
-        .catch((e) => console.error(`Failed ${email}:`, e.message));
-    });
-  },
-  { timezone: "Asia/Amman" }
-);
-// Serve static files from the public directory
 
 // const connectDB = require("./config/db");
 const volunteerRoutes = require("./routes/volunteerRoutes");
@@ -52,6 +28,8 @@ const partnerRoutes = require("./routes/partnerRoutes");
 const individualPartnerRoutes = require("./routes/individualPartnerRoutes");
 const program = require("./routes/programRoutes");
 const registerRoutes = require("./routes/register");
+const homeRoutes = require("./routes/homeRoutes");
+const resourceRoutes = require("./routes/resourceRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -83,6 +61,9 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/programs", program);
 app.use("/api/register", registerRoutes);
 app.use("/api/success", successStoryRoutes);
+app.use("/api/home", homeRoutes);
+app.use("/api", resourceRoutes);
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {
