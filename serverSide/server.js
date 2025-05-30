@@ -44,7 +44,7 @@ const trainerRoutes = require("./routes/trainerRoutes");
 const traineeRoutes = require("./routes/traineeRoutes");
 const partnerRoutes = require("./routes/partnerRoutes");
 const individualPartnerRoutes = require("./routes/individualPartnerRoutes");
-
+const bookingRoutes = require("./routes/bookingRoutes");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -67,7 +67,7 @@ app.use("/api", individualPartnerRoutes);
 app.use("/api/add", subscriberRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/admin", adminRoutes);
-
+app.use("/api/bookings", bookingRoutes);
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Server error:', err);

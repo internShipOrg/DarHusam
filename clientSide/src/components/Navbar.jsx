@@ -9,8 +9,8 @@ function Navbar() {
     { name: 'الرئيسية', path: '/' },
     { 
       name: 'من نحن', 
-      path: '/about',
-      hasDropdown: true
+      path: '/AboutUs',
+      // hasDropdown: true
     },
     { 
       name: 'برامج التدريب', 
@@ -108,7 +108,7 @@ function Navbar() {
                       <span>{item.name}</span>
                       <ChevronDown size={14} className={activeDropdown === index ? 'transform rotate-180' : ''} />
                     </button>
-                    {activeDropdown === index && (
+                    {/* {activeDropdown === index && (
                       <div className="pr-4 pl-2 py-1">
                         <a href="#" className="block px-3 py-2 text-gray-600 hover:text-[#780C28] hover:bg-gray-50 rounded-md">
                           قائمة فرعية 1
@@ -117,7 +117,7 @@ function Navbar() {
                           قائمة فرعية 2
                         </a>
                       </div>
-                    )}
+                    )} */}
                   </>
                 ) : (
                   <a
