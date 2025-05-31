@@ -18,6 +18,11 @@ const successStorySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    //ali addition
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

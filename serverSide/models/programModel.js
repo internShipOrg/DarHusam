@@ -6,12 +6,14 @@ const programSchema = new mongoose.Schema({
   category: String,
   startDate: String,
   endDate: String,
+  ///ali edition
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 module.exports = mongoose.model("Program", programSchema);
-
-
-
 
 // const programs = [
 //     {
@@ -39,6 +41,5 @@ module.exports = mongoose.model("Program", programSchema);
 //       endDate: "2025-06-10",
 //     },
 //   ];
-  
+
 //   export default programs;
-  
