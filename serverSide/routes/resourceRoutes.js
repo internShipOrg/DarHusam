@@ -1,96 +1,57 @@
 const express = require('express');
 const router = express.Router();
-const resourceController = require('../controllers/resourceController');
-
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { protect, authorize } = require('../middleware/auth');
+const {
+  getAllResources,
+  addResource,
+  deleteResource,
+  downloadResource
+} = require('../controllers/resourceController');
 
-// Set up multer for file uploads
+// Ensure uploads directory exists
+const uploadDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Configure multer for file uploads
 const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-    const uploadDir = 'uploads/resources';
-    
-    // Create directory if it doesn't exist
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    
+  destination: function (req, file, cb) {
     cb(null, uploadDir);
   },
-  filename: function(req, file, cb) {
-    // Create a unique file name
+  filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
   }
 });
 
-// Filter files based on type
+// File filter
 const fileFilter = (req, file, cb) => {
-  // Define allowed file types based on category
-  let allowedTypes;
-  
-  switch (req.body.category) {
-    case 'pdf':
-      allowedTypes = ['application/pdf'];
-      break;
-    case 'videos':
-      allowedTypes = ['video/mp4', 'video/webm', 'video/quicktime'];
-      break;
-    case 'presentations':
-      allowedTypes = [
-        'application/vnd.ms-powerpoint',
-        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'application/pdf'
-      ];
-      break;
-    case 'articles':
-      allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-      break;
-    default:
-      allowedTypes = [
-        'application/pdf',
-        'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'application/vnd.ms-powerpoint',
-        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'video/mp4',
-        'video/webm',
-        'image/jpeg',
-        'image/png',
-        'application/zip',
-        'application/x-zip-compressed'
-      ];
-  }
-  
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);  // Accept file
-  } else {
-    cb(new Error(`نوع الملف غير مسموح به. الأنواع المسموح بها: ${allowedTypes.join(', ')}`), false);
-  }
+  // Accept all file types for now
+  cb(null, true);
 };
 
-const upload = multer({ 
-  storage,
-  fileFilter,
+const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
   limits: {
-    fileSize: 100 * 1024 * 1024 // 100MB limit
+    fileSize: 10 * 1024 * 1024 // 10MB limit
   }
 });
 
-// Public routes (no authentication required)
-router.get('/', resourceController.getAllResources);
-router.get('/:id', resourceController.getResource);
-router.get('/:id/download', resourceController.downloadResource);
+// Public routes
+router.get('/', getAllResources);
+router.get('/:id/download', downloadResource);
 
-// Protected routes (authentication required)
+// Protected routes (admin only)
+router.post('/', protect, authorize('admin'), upload.fields([
+  { name: 'file', maxCount: 1 },
+  { name: 'thumbnail', maxCount: 1 }
+]), addResource);
 
-
-// Admin-only routes
-
-router.post('/', upload.single('file'), resourceController.createResource);
-router.patch('/:id', upload.single('file'), resourceController.updateResource);
-router.delete('/:id', resourceController.deleteResource);
+router.delete('/:id', protect, authorize('admin'), deleteResource);
 
 module.exports = router;

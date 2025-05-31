@@ -22,8 +22,8 @@ const ResourceLibrary = () => {
     const fetchResources = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get('/api/resources');
-        setResources(response.data.data||[]);
+        const response = await axios.get('http://localhost:5000/api/resources');
+        setResources(response.data.data || []);
         setFilteredResources(response.data.data || []);
         setIsLoading(false);
       } catch (err) {
@@ -51,21 +51,21 @@ const ResourceLibrary = () => {
   const getResourceIcon = (category) => {
     switch (category) {
       case 'articles':
-        return <FileText className="text-primary" size={24} />;
+        return <FileText className="text-[#780C28]" size={24} />;
       case 'videos':
-        return <Video className="text-primary" size={24} />;
+        return <Video className="text-[#780C28]" size={24} />;
       case 'presentations':
-        return <FileText className="text-primary" size={24} />;
+        return <FileText className="text-[#780C28]" size={24} />;
       case 'pdf':
-        return <File className="text-primary" size={24} />;
+        return <File className="text-[#780C28]" size={24} />;
       default:
-        return <BookOpen className="text-primary" size={24} />;
+        return <BookOpen className="text-[#780C28]" size={24} />;
     }
   };
 
   const handleDownload = async (resourceId) => {
     try {
-      const response = await axios.get(`/api/resources/${resourceId}/download`, {
+      const response = await axios.get(`http://localhost:5000/api/resources/${resourceId}/download`, {
         responseType: 'blob'
       });
       
@@ -116,7 +116,7 @@ const ResourceLibrary = () => {
               <input
                 type="text"
                 placeholder="ابحث عن موارد..."
-                className="block w-full border border-gray-300 rounded-lg py-3 pr-10 pl-4 text-gray-900 focus:ring-2 focus:ring-[#6E8E59] focus:border-[#6E8E59]"
+                className="block w-full border border-gray-300 rounded-lg py-3 pr-10 pl-4 text-gray-900 focus:ring-2 focus:ring-[#780C28] focus:border-[#780C28]"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -126,7 +126,7 @@ const ResourceLibrary = () => {
             <div className="md:hidden w-full">
               <div className="relative">
                 <select
-                  className="block w-full bg-white border border-gray-300 rounded-lg py-3 pr-4 pl-10 text-gray-900 appearance-none focus:ring-2 focus:ring-[#6E8E59] focus:border-[#6E8E59]"
+                  className="block w-full bg-white border border-gray-300 rounded-lg py-3 pr-4 pl-10 text-gray-900 appearance-none focus:ring-2 focus:ring-[#780C28] focus:border-[#780C28]"
                   value={activeCategory}
                   onChange={(e) => setActiveCategory(e.target.value)}
                 >
@@ -195,7 +195,7 @@ const ResourceLibrary = () => {
                       alt={resource.title} 
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute top-3 right-3 bg-[#6E8E59] text-white text-xs font-medium px-2 py-1 rounded">
+                    <div className="absolute top-3 right-3 bg-[#780C28] text-white text-xs font-medium px-2 py-1 rounded">
                       {categories.find(c => c.id === resource.category)?.label || 'مورد'}
                     </div>
                   </div>

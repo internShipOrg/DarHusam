@@ -22,10 +22,14 @@ const contactSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  isDeleted: {
+    type: Boolean,
+    default: false // حذف ناعم: إذا true يعتبر محذوف ولا يظهر في القوائم
+  },
   createdAt: {
     type: Date,
     default: Date.now
   }
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Contact', contactSchema); 

@@ -75,7 +75,7 @@ const IndividualPartnerForm = () => {
 
     setIsLoading(true);
     try {
-      await axios.post('http://localhost:5000/api/individual-partners', formData);
+      await axios.post('http://localhost:5000/api/individual-partner/submit', formData);
       toast.success('تم التسجيل بنجاح');
       navigate('/');
     } catch (error) {
