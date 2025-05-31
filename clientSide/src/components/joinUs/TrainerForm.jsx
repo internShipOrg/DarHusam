@@ -132,7 +132,7 @@ const TrainerForm = () => {
     setLoading(true);
 
     try {
-      await axios.post("http://localhost:5000/api/trainers", formData);
+      await axios.post("http://localhost:5000/api/trainer/submit", formData);
       toast.success("تم تسجيل طلب التدريب بنجاح! سيتم التواصل معك قريباً.");
       setFormData({
         fullName: "",

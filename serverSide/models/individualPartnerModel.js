@@ -15,7 +15,8 @@ const individualPartnerSchema = new mongoose.Schema({
   cv: { type: String }, // Base64 string of CV file
   socialMedia: { type: String },
   confirmation: { type: Boolean, required: true },
-  status: { type: String, default: "pending", enum: ["pending", "approved", "rejected"] }
-});
+  status: { type: String, default: "pending", enum: ["pending", "approved", "rejected"] },
+  isDeleted: { type: Boolean, default: false }
+}, { timestamps: true });
 
 module.exports = mongoose.model("IndividualPartner", individualPartnerSchema); 

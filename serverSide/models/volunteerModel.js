@@ -6,6 +6,7 @@ const volunteerSchema = new mongoose.Schema({
   nationalID: { type: String, required: true, unique: true },
   phone: { type: String, required: true },
   alternatePhone: { type: String },
+  email: { type: String, required: true, unique: true },
   residence: { type: String, required: true },
   educationLevel: { type: String, enum: ["اعدادي", "ثانوي", "توجيهي", "بكالوريوس", "دراسات عليا"], required: true },
   major: { type: String },
@@ -15,7 +16,8 @@ const volunteerSchema = new mongoose.Schema({
   skills: { type: String },
   source: { type: String },
   availability: { type: String, required: true },
-  status: { type: String, default: "pending", enum: ["pending", "approved", "rejected"] }
-});
+  status: { type: String, default: "pending", enum: ["pending", "approved", "rejected"] },
+  isDeleted: { type: Boolean, default: false } // حذف ناعم: إذا true يعتبر محذوف ولا يظهر في القوائم
+}, { timestamps: true });
 
 module.exports = mongoose.model("Volunteer", volunteerSchema);

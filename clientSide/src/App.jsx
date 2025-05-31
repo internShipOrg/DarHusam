@@ -36,7 +36,7 @@ const Layout = ({ children }) => {
     <div className="flex flex-col min-h-screen">
       {!isAdminPage && <Navbar />}
       <main className="flex-grow">{children}</main>
-      {/* {!isAdminPage && <Footer />} */}
+      {!isAdminPage && <Footer />}
     </div>
   );
 };
@@ -70,7 +70,6 @@ const App = () => {
           <Route path="/success-stories" element={<SuccessStories />} />
         </Routes>
       </Layout>
-      <Footer/>
     </Router>
   );
 };

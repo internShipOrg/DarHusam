@@ -8,6 +8,7 @@ exports.createVolunteer = async (req, res) => {
       fullName, 
       nationalID, 
       phone, 
+      email,
       residence, 
       educationLevel, 
       previousExperience, 
@@ -20,6 +21,7 @@ exports.createVolunteer = async (req, res) => {
       !fullName || 
       !nationalID || 
       !phone || 
+      !email ||
       !residence || 
       !educationLevel || 
       previousExperience === undefined || 

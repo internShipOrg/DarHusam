@@ -94,11 +94,11 @@ exports.getDashboardStats = async (req, res) => {
       individualPartners
     ] = await Promise.all([
       Contact.find().sort({ createdAt: -1 }),
-      Volunteer.find().sort({ createdAt: -1 }),
-      Trainer.find().sort({ createdAt: -1 }),
-      Trainee.find().sort({ createdAt: -1 }),
-      Partner.find().sort({ createdAt: -1 }),
-      IndividualPartner.find().sort({ createdAt: -1 })
+      Volunteer.find({ isDeleted: false }).sort({ createdAt: -1 }),
+      Trainer.find({ isDeleted: false }).sort({ createdAt: -1 }),
+      Trainee.find({ isDeleted: false }).sort({ createdAt: -1 }),
+      Partner.find({ isDeleted: false }).sort({ createdAt: -1 }),
+      IndividualPartner.find({ isDeleted: false }).sort({ createdAt: -1 })
     ]);
 
     res.status(200).json({
