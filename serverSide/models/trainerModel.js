@@ -20,7 +20,8 @@ const trainerSchema = new mongoose.Schema({
     residence: { type: String }
   }],
   confirmation: { type: Boolean, required: true },
-  status: { type: String, default: "pending", enum: ["pending", "approved", "rejected"] }
-});
+  status: { type: String, default: "pending", enum: ["pending", "approved", "rejected"] },
+  isDeleted: { type: Boolean, default: false }
+}, { timestamps: true });
 
 module.exports = mongoose.model("Trainer", trainerSchema);
