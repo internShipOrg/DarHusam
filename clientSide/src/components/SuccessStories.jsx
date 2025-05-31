@@ -66,31 +66,57 @@ const SuccessStories = () => {
     },
   ];
 
+  // useEffect(() => {
+  //   const fetchStories = async () => {
+  //     setLoading(true);
+  //     try {
+  //       // Attempt to fetch from API
+  //       const response = await fetch(
+  //         "http://localhost:5000/api/success-stories"
+  //       );
+  //       const data = await response.json();
+
+  //       if (data.length === 0) {
+  //         setStories(dummyStories);
+  //       } else {
+  //         setStories(data);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching stories:", error);
+  //       setStories(dummyStories);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchStories();
+  // }, []);
+
   useEffect(() => {
-    const fetchStories = async () => {
-      setLoading(true);
-      try {
-        // Attempt to fetch from API
-        const response = await fetch(
-          "http://localhost:5000/api/success-stories"
-        );
-        const data = await response.json();
-
-        if (data.length === 0) {
-          setStories(dummyStories);
-        } else {
-          setStories(data);
-        }
-      } catch (error) {
-        console.error("Error fetching stories:", error);
-        setStories(dummyStories);
-      } finally {
-        setLoading(false);
+  const fetchStories = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:5000/api/success-stories");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
+      const data = await response.json();
+      if (!Array.isArray(data) || data.length === 0) {
+        setStories(dummyStories);
+      } else {
+        setStories(data);
+      }
+    } catch (error) {
+      console.error("Error fetching stories:", error);
+      setStories(dummyStories);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchStories();
-  }, []);
+  fetchStories();
+}, []);
+
 
   const closeStoryDetails = () => {
     setActiveStory(null);
@@ -110,7 +136,7 @@ const SuccessStories = () => {
       <div className="container mx-auto relative z-10 text-center">
         <div
           className="inline-block px-6 py-3 mb-6 rounded-lg"
-          style={{ background: `${colors.primary}99` }} // Semi-transparent background
+          style={{ background: `${colors.primary}99` }} 
         >
           <h1 className="text-white text-3xl md:text-5xl font-bold">
             قصص النجاح
@@ -375,47 +401,7 @@ const SuccessStories = () => {
         </div>
       </section>
 
-      {/* Footer Section with Logo */}
-      <footer className="py-8" style={{ background: colors.primary }}>
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-6 md:mb-0">
-              <div className="flex items-center">
-                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center">
-                  <span
-                    className="text-2xl font-bold"
-                    style={{ color: colors.primary }}
-                  >
-                    دح
-                  </span>
-                </div>
-                <h3 className="text-white text-xl font-bold mr-3">
-                  دار الحسام للخدمات المجتمعية
-                </h3>
-              </div>
-            </div>
-            <div className="flex space-x-6">
-              <a href="#" className="text-white hover:text-gray-200">
-                تواصل معنا
-              </a>
-              <a href="#" className="text-white hover:text-gray-200 mr-6">
-                حول الدار
-              </a>
-              <a href="#" className="text-white hover:text-gray-200 mr-6">
-                البرامج
-              </a>
-              <a href="#" className="text-white hover:text-gray-200 mr-6">
-                الرئيسية
-              </a>
-            </div>
-          </div>
-          <div className="mt-8 pt-6 border-t border-white border-opacity-20 text-center">
-            <p className="text-white text-opacity-80">
-              جميع الحقوق محفوظة © دار الحسام {new Date().getFullYear()}
-            </p>
-          </div>
-        </div>
-      </footer>
+      
 
       {/* Story Modal */}
       {activeStory && <StoryModal story={activeStory} />}

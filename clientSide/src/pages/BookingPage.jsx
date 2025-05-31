@@ -34,7 +34,7 @@ const BookingPage = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "http://localhost:9000/api/bookings/booked-times"
+        "http://localhost:5000/api/bookings/booked-times"
       );
       if (!response.ok) {
         throw new Error("فشل في الحصول على الأوقات المحجوزة");
@@ -77,9 +77,9 @@ const BookingPage = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 max-w-6xl">
+    <div className="container mx-auto p-4 max-w-6xl mt-10 mb-8">
       <div className="text-center mb-10">
-        <h1 className="text-4xl font-bold text-[#780C28] mb-3">حجز القاعات</h1>
+        <h1 className="text-4xl font-bold text-[#780C28]  mb-3">حجز القاعات</h1>
         <p className="text-gray-600 max-w-2xl mx-auto">
           اختر إحدى قاعاتنا المميزة وقم بحجزها في الوقت المناسب لك. نوفر لك
           قاعات مجهزة بأحدث التقنيات لمناسباتك المختلفة.

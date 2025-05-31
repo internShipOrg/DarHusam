@@ -13,6 +13,7 @@ function Navbar() {
     { name: "الأخبار والفعاليات", path: "/news" },
     { name: "قصص النجاح", path: "/success-stories" },
     { name: "مكتبة الموارد", path: "/resources" },
+    { name: "حجز القاعات", path: "/bookingPage" },
     {
       name: "حولنا",
       path: "#",
