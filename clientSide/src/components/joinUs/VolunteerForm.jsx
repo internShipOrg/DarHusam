@@ -9,6 +9,7 @@ const VolunteerForm = () => {
     nationalID: "",
     phone: "",
     alternatePhone: "",
+    email: "",
     residence: "",
     educationLevel: "",
     major: "",
@@ -30,6 +31,7 @@ const VolunteerForm = () => {
       "fullName",
       "nationalID",
       "phone",
+      "email",
       "residence",
       "educationLevel",
       "preferredField",
@@ -48,6 +50,10 @@ const VolunteerForm = () => {
 
     if (formData.phone && !/^\d{10}$/.test(formData.phone)) {
       errors.phone = "رقم الهاتف يجب أن يتكون من 10 أرقام";
+    }
+
+    if (formData.email && !/^\S+@\S+\.\S+$/.test(formData.email)) {
+      errors.email = "يرجى إدخال بريد إلكتروني صحيح";
     }
 
     if (!formData.confirmation) {
@@ -82,10 +88,13 @@ const VolunteerForm = () => {
       return;
     }
 
+    // طباعة البيانات في الكونسول للمساعدة في التصحيح
+    console.log('بيانات النموذج المرسلة:', formData);
+
     setLoading(true);
     
     try {
-      const response = await axios.post('http://localhost:5000/api/volunteers', formData);
+      const response = await axios.post('http://localhost:5000/api/volunteer/submit', formData);
       
       if (response.status === 201) {
         toast.success('تم التسجيل بنجاح');
@@ -94,6 +103,7 @@ const VolunteerForm = () => {
           nationalID: "",
           phone: "",
           alternatePhone: "",
+          email: "",
           residence: "",
           educationLevel: "",
           major: "",
@@ -108,6 +118,7 @@ const VolunteerForm = () => {
       }
     } catch (error) {
       if (error.response) {
+        // إظهار رسالة السيرفر للمستخدم إذا كانت موجودة
         toast.error(error.response.data.message || 'حدث خطأ أثناء التسجيل');
       } else if (error.request) {
         toast.error('لم يتم الاتصال بالسيرفر. يرجى المحاولة مرة أخرى');
@@ -229,6 +240,29 @@ const VolunteerForm = () => {
                       placeholder="05xxxxxxxx"
                     />
                   </div>
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="block mb-2 font-medium text-[#780C28]">
+                    البريد الإلكتروني <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Mail size={18} className="absolute right-3 top-3.5 text-[#780C28]" />
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className={getInputClass("email")}
+                      placeholder="example@email.com"
+                    />
+                  </div>
+                  {formErrors.email && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <AlertCircle size={14} className="ml-1" /> {formErrors.email}
+                    </p>
+                  )}
                 </div>
 
                 {/* Residence */}

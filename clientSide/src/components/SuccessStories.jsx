@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 const SuccessStories = () => {
   const [stories, setStories] = useState([]);
   const [activeStory, setActiveStory] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Color scheme - refined palette
   const colors = {
@@ -21,6 +23,7 @@ const SuccessStories = () => {
       name: "محمد علي",
       title: "صاحب مشروع ناجح",
       imageUrl: "/api/placeholder/400/300",
+      videoUrl: "/api/placeholder/video",
       shortStory:
         "بدعم من دار الحسام، استطاع محمد إنشاء مشروعه التجاري الخاص وتحقيق الاستقلال المالي.",
       fullStory:
@@ -33,6 +36,7 @@ const SuccessStories = () => {
       name: "سارة أحمد",
       title: "مدربة حرف يدوية",
       imageUrl: "/api/placeholder/400/300",
+      videoUrl: "/api/placeholder/video",
       shortStory:
         "سارة وجدت الأمل من جديد بعد مشاركتها في برامج التأهيل المهني التي قدمتها دار الحسام.",
       fullStory:
@@ -45,6 +49,7 @@ const SuccessStories = () => {
       name: "خالد يوسف",
       title: "قائد مجتمعي",
       imageUrl: "/api/placeholder/400/300",
+      videoUrl: "/api/placeholder/video",
       shortStory:
         "بفضل الدورات التدريبية، أصبح خالد مدرباً معتمداً وقائداً مجتمعياً مميزاً.",
       fullStory:
@@ -57,6 +62,7 @@ const SuccessStories = () => {
       name: "ليلى حسن",
       title: "خبيرة تكنولوجيا المعلومات",
       imageUrl: "/api/placeholder/400/300",
+      videoUrl: "/api/placeholder/video",
       shortStory:
         "انتقلت ليلى من البطالة إلى العمل في مجال التكنولوجيا بفضل برامج التدريب المتخصصة.",
       fullStory:
@@ -70,19 +76,16 @@ const SuccessStories = () => {
     const fetchStories = async () => {
       setLoading(true);
       try {
-        // Attempt to fetch from API
-        const response = await fetch(
-          "http://localhost:5000/api/success-stories"
-        );
-        const data = await response.json();
-
-        if (data.length === 0) {
-          setStories(dummyStories);
+        const response = await axios.get("http://localhost:5000/api/home/success-stories");
+        if (Array.isArray(response.data)) {
+          setStories(response.data);
         } else {
-          setStories(data);
+          console.warn("Invalid data format received, using dummy stories");
+          setStories(dummyStories);
         }
       } catch (error) {
         console.error("Error fetching stories:", error);
+        setError(error.response?.data?.message || "حدث خطأ أثناء تحميل القصص");
         setStories(dummyStories);
       } finally {
         setLoading(false);
@@ -110,7 +113,7 @@ const SuccessStories = () => {
       <div className="container mx-auto relative z-10 text-center">
         <div
           className="inline-block px-6 py-3 mb-6 rounded-lg"
-          style={{ background: `${colors.primary}99` }} // Semi-transparent background
+          style={{ background: `${colors.primary}99` }}
         >
           <h1 className="text-white text-3xl md:text-5xl font-bold">
             قصص النجاح
@@ -143,6 +146,9 @@ const SuccessStories = () => {
           src={story.imageUrl}
           alt={story.name}
           className="w-full h-64 object-cover"
+          onError={(e) => {
+            e.target.src = "/placeholder-image.jpg";
+          }}
         />
         <div
           className="absolute top-4 left-4 px-3 py-1 rounded-full text-white text-sm font-semibold shadow-md"
@@ -221,6 +227,9 @@ const SuccessStories = () => {
             src={story.imageUrl}
             alt={story.name}
             className="w-full h-80 object-cover"
+            onError={(e) => {
+              e.target.src = "/placeholder-image.jpg";
+            }}
           />
           <button
             className="absolute top-4 left-4 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition-colors"
@@ -277,7 +286,7 @@ const SuccessStories = () => {
                 fill={`${colors.primary}40`}
                 className="absolute top-4 right-4 w-16 h-16"
               >
-                <path d="M11.192 15.757c0-.88-.23-1.618-.69-2.217-.326-.412-.768-.683-1.327-.812-.55-.128-1.07-.137-1.54-.028-.16-.95.1-1.626.41-2.03a4.41 4.41 0 0 1 1.91-1.03c.634-.176.96-.42.96-.756 0-.344-.304-.577-.896-.756l-.928-.266c-.826-.23-1.29-.682-1.45-1.366-.14-.684-.03-1.533.114-2.285.127-.656.19-1.186.19-1.565 0-.38-.086-.65-.258-.815-.21-.18-.47-.265-.872-.265H4.066c-.166 0-.33.033-.49.1-.284.1-.5.25-.764.504-.224.223-.422.504-.56.838l-.098.17c-.38.664-.713 1.428-.98 2.28-.211.677-.51 1.35-.72 2.027-.396 1.283-.22 2.433.365 3.294.5.723 1.33 1.29 2.416 1.656.426.143.656.333.726.563.07.23-.055.418-.19.55-.026.022-.055.042-.086.06l.068-.022c.527-.173.994-.236 1.437-.233.53.006 1.083.102 1.576.345.716.334 1.26.82 1.618 1.5.335.63.506 1.38.506 2.233 0 .66-.08 1.138-.256 1.587-.148.374-.35.7-.578.916-.225.237-.526.352-.854.383-.25.02-.512-.02-.766-.096-.166-.05-.32-.145-.506-.265l-.102-.066c-.593-.39-1.067-.538-1.5-.628-.31-.07-.553-.083-.707-.058-.055.01-.104.022-.15.04-.15.063-.144.182.17.257.578.26 1.15.605 1.618 1.04.567.533.968 1.187 1.14 1.964.9.412.132.806.132 1.298 0 .622-.19 1.245-.578 1.835-.31.463-.835.82-1.456.928a4.1 4.1 0 0 1-.954.06c-.414-.026-.794-.137-1.146-.33-.556-.31-.93-.772-1.097-1.373-.132-.476-.132-.846-.004-1.108.033-.07.08-.134.127-.2l.003-.004c.356-.5.608-.75.835-1.254.23-.506.365-1.156.365-1.952 0-.898-.148-1.57-.43-2.052-.286-.483-.7-.77-1.24-.863-.556-.1-1.1.038-1.638.393-.637.413-1.02.974-1.233 1.696-.354 1.183-.248 2.850.216 5.015.128.597.304 1.158.56 1.712.276.594.678 1.13 1.187 1.578.517.458 1.16.825 1.89 1.06.81.263 1.75.387 2.743.387 1.333 0 2.53-.224 3.643-.67 1.112-.448 2.03-1.024 2.773-1.726.736-.7 1.293-1.5 1.676-2.392.384-.893.574-1.776.574-2.68 0-.586-.054-1.128-.193-1.686-.14-.558-.382-1.076-.733-1.55a4.588 4.588 0 0 0-1.378-1.174c-.98-.518-2.186-.826-3.478-.826z" />
+                <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
               </svg>
               <p className="text-gray-700 italic text-lg relative z-10">
                 "{story.testimonial}"
@@ -306,6 +315,18 @@ const SuccessStories = () => {
       </div>
     </div>
   );
+
+  if (loading) {
+    return <LoadingState />;
+  }
+
+  if (error) {
+    return (
+      <div className="py-16 text-center">
+        <p className="text-red-500 text-lg">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div style={{ direction: "rtl" }}>
@@ -337,15 +358,11 @@ const SuccessStories = () => {
             </p>
           </div>
 
-          {loading ? (
-            <LoadingState />
-          ) : (
-            <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-              {stories.map((story) => (
-                <StoryCard key={story._id} story={story} />
-              ))}
-            </div>
-          )}
+          <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {stories.map((story) => (
+              <StoryCard key={story._id} story={story} />
+            ))}
+          </div>
 
           {/* Call to Action */}
           <div
@@ -375,47 +392,6 @@ const SuccessStories = () => {
         </div>
       </section>
 
-      {/* Footer Section with Logo */}
-      <footer className="py-8" style={{ background: colors.primary }}>
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-6 md:mb-0">
-              <div className="flex items-center">
-                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center">
-                  <span
-                    className="text-2xl font-bold"
-                    style={{ color: colors.primary }}
-                  >
-                    دح
-                  </span>
-                </div>
-                <h3 className="text-white text-xl font-bold mr-3">
-                  دار الحسام للخدمات المجتمعية
-                </h3>
-              </div>
-            </div>
-            <div className="flex space-x-6">
-              <a href="#" className="text-white hover:text-gray-200">
-                تواصل معنا
-              </a>
-              <a href="#" className="text-white hover:text-gray-200 mr-6">
-                حول الدار
-              </a>
-              <a href="#" className="text-white hover:text-gray-200 mr-6">
-                البرامج
-              </a>
-              <a href="#" className="text-white hover:text-gray-200 mr-6">
-                الرئيسية
-              </a>
-            </div>
-          </div>
-          <div className="mt-8 pt-6 border-t border-white border-opacity-20 text-center">
-            <p className="text-white text-opacity-80">
-              جميع الحقوق محفوظة © دار الحسام {new Date().getFullYear()}
-            </p>
-          </div>
-        </div>
-      </footer>
 
       {/* Story Modal */}
       {activeStory && <StoryModal story={activeStory} />}

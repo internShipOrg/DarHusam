@@ -198,7 +198,7 @@ const PartnerForm = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:5000/api/partners", {
+      const response = await axios.post("http://localhost:5000/api/partner/submit", {
         ...formData,
         organizationName: formData.organizationName.trim(),
         organizationLocation: formData.organizationLocation.trim(),
