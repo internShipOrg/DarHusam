@@ -16,6 +16,7 @@ import {
   BookOpen,
   Plus,
   ChevronLeft,
+  CalendarDays,
   ChevronRight,
   Search,
   Bell,
@@ -26,6 +27,7 @@ import Swal from "sweetalert2";
 import AdminForms from "../../components/NewsEvents/AdminForm";
 import AdminSuccessStories from "./AdminSuccessStories";
 import AdminPrograms from "./AdminPrograms";
+import AdminBookings from "./AdminBookings";
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
@@ -102,6 +104,7 @@ const Dashboard = () => {
     { id: "success-stories", label: "قصص النجاح", icon: BookOpen },
     { id: "programs", label: "البرامج", icon: Calendar },
     { id: "resources", label: "الموارد", icon: BookOpen },
+    { id: "bookings", label: "الحجوزات", icon: CalendarDays },
   ];
 
   const handleAddResource = async (e) => {
@@ -735,6 +738,7 @@ const Dashboard = () => {
               {activeTab === "news" && <AdminForms />}
               {activeTab === "success-stories" && <AdminSuccessStories />}
               {activeTab === "programs" && <AdminPrograms />}
+              {activeTab === "bookings" && <AdminBookings />}
 
               {activeTab === "trainers" && (
                 <div>
