@@ -62,8 +62,8 @@ const App = () => {
           <Route path="/resources" element={<ResourceLibrary />} />
 
           <Route path="/contact" element={<ContactUs />} />
-          <Route path="/AboutUS" element={<AboutUs />} />
-          <Route path="/BookingPage" element={<BookingPage />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/bookingPage" element={<BookingPage />} />
           <Route path="/admin/setup" element={<AdminSetup />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />

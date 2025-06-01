@@ -7,31 +7,13 @@ import { motion } from 'framer-motion';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
-  // const [email, setEmail] = useState('');
-  // const [loading, setLoading] = useState(false);
+  
   const fadeIn = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 }
 };
 
-  // const handleSubscribe = async () => {
-  //   if (!email) {
-  //     toast.warn('أدخل البريد الإلكتروني');
-  //     return;
-  //   }
-  //   setLoading(true);
-  //   try {
-  //     await axios.post('http://localhost:5000/api/add/subscribe', { email });
-  //     toast.success('✅ تم الاشتراك بنجاح');
-  //     setEmail('');
-  //   } catch (err) {
-  //     const msg = err.response?.data?.error || err.message || 'فشل الاشتراك';
-  //     toast.error(`❌ ${msg}`);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
+ 
   return (
     <footer className="bg-white text-[#780C28] w-full py-8 shadow-2xl shadow-[#780C28]">
       {/* Toast container */}
@@ -56,10 +38,10 @@ export default function Footer() {
               روابط سريعة
             </h3>
             <ul className="space-y-2 text-right">
-              <li><a href="#" className="hover:text-[#6E8E59] transition-colors duration-300">الصفحة الرئيسية</a></li>
-              <li><a href="#" className="hover:text-[#6E8E59] transition-colors duration-300">من نحن</a></li>
-              <li><a href="#" className="hover:text-[#6E8E59] transition-colors duration-300">خدماتنا</a></li>
-              <li><a href="#" className="hover:text-[#6E8E59] transition-colors duration-300">اتصل بنا</a></li>
+              <li><a href="/" className="hover:text-[#6E8E59] transition-colors duration-300">الصفحة الرئيسية</a></li>
+              <li><a href="/about" className="hover:text-[#6E8E59] transition-colors duration-300">من نحن</a></li>
+              <li><a href="/training-programs" className="hover:text-[#6E8E59] transition-colors duration-300">برامج التدريب</a></li>
+              <li><a href="/contact" className="hover:text-[#6E8E59] transition-colors duration-300">اتصل بنا</a></li>
             </ul>
           </div>
 
@@ -69,47 +51,23 @@ export default function Footer() {
               حسابات التواصل الاجتماعي
             </h3>
             <div className="flex space-x-4 justify-end">
-              <a href="#" className="bg-white text-[#780C28] p-2 rounded-full hover:bg-[#6E8E59] hover:text-white transition-colors duration-300">
-                <Mail size={20} />
-              </a>
-              <a href="#" className="bg-white text-[#780C28] p-2 rounded-full hover:bg-[#6E8E59] hover:text-white transition-colors duration-300">
+              
+              <a href="https://www.linkedin.com/company/%D8%AF%D8%A7%D8%B1-%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D9%85-%D9%84%D9%84%D8%B9%D9%85%D9%84-%D8%A7%D9%84%D8%B4%D8%A8%D8%A7%D8%A8%D9%8A/" className="bg-white text-[#780C28] p-2 rounded-full hover:bg-[#6E8E59] hover:text-white transition-colors duration-300">
                 <Linkedin size={20} />
               </a>
-              <a href="#" className="bg-white text-[#780C28] p-2 rounded-full hover:bg-[#6E8E59] hover:text-white transition-colors duration-300">
+              <a href="https://www.instagram.com/daralhussamjo/?igsh=Y3djMjU3aTVxejl6#" className="bg-white text-[#780C28] p-2 rounded-full hover:bg-[#6E8E59] hover:text-white transition-colors duration-300">
                 <Instagram size={20} />
               </a>
-              <a href="#" className="bg-white text-[#780C28] p-2 rounded-full hover:bg-[#6E8E59] hover:text-white transition-colors duration-300">
+              <a href="https://chat.whatsapp.com/Jiz1AfbuqqgElNorc85glG" className="bg-white text-[#780C28] p-2 rounded-full hover:bg-[#6E8E59] hover:text-white transition-colors duration-300">
                 <Twitter size={20} />
               </a>
-              <a href="#" className="bg-white text-[#780C28] p-2 rounded-full hover:bg-[#6E8E59] hover:text-white transition-colors duration-300">
+              <a href="https://www.facebook.com/DarAlHussamJo" className="bg-white text-[#780C28] p-2 rounded-full hover:bg-[#6E8E59] hover:text-white transition-colors duration-300">
                 <Facebook size={20} />
               </a>
             </div>
           </div>
 
-          {/* Newsletter */}
-          {/* <div className="mb-6 md:mb-0">
-            <h3 className="text-xl font-bold mb-4 border-b-2 border-[#6E8E59] pb-2 text-right">
-              النشرة الإخبارية
-            </h3>
-            <p className="mb-4 text-right">اشترك للحصول على آخر الأخبار والتحديثات</p>
-            <div className="flex flex-row-reverse">
-              <button
-                onClick={handleSubscribe}
-                disabled={loading}
-                className={`bg-[#6E8E59] hover:bg-white hover:text-[#780C28] px-4 py-2 rounded-r-md transition-colors duration-300 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                {loading ? 'جاري الاشتراك...' : 'اشتراك'}
-              </button>
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="البريد الإلكتروني"
-                className="py-2 px-4 focus:outline-none rounded-l-md border border-[#780C28] text-right text-[#780C28]"
-              />
-            </div>
-          </div> */}
+          
           <motion.div
             variants={fadeIn}
             initial="hidden"

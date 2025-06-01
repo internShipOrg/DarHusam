@@ -72,28 +72,57 @@ const SuccessStories = () => {
     },
   ];
 
-  useEffect(() => {
-    const fetchStories = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get("http://localhost:5000/api/home/success-stories");
-        if (Array.isArray(response.data)) {
-          setStories(response.data);
-        } else {
-          console.warn("Invalid data format received, using dummy stories");
-          setStories(dummyStories);
-        }
-      } catch (error) {
-        console.error("Error fetching stories:", error);
-        setError(error.response?.data?.message || "حدث خطأ أثناء تحميل القصص");
-        setStories(dummyStories);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchStories = async () => {
+  //     setLoading(true);
+  //     try {
+  //       // Attempt to fetch from API
+  //       const response = await fetch(
+  //         "http://localhost:5000/api/success-stories"
+  //       );
+  //       const data = await response.json();
 
-    fetchStories();
-  }, []);
+  //       if (data.length === 0) {
+  //         setStories(dummyStories);
+  //       } else {
+  //         setStories(data);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching stories:", error);
+  //       setStories(dummyStories);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchStories();
+  // }, []);
+
+  useEffect(() => {
+  const fetchStories = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:5000/api/success-stories");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      if (!Array.isArray(data) || data.length === 0) {
+        setStories(dummyStories);
+      } else {
+        setStories(data);
+      }
+    } catch (error) {
+      console.error("Error fetching stories:", error);
+      setStories(dummyStories);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchStories();
+}, []);
+
 
   const closeStoryDetails = () => {
     setActiveStory(null);
@@ -113,7 +142,7 @@ const SuccessStories = () => {
       <div className="container mx-auto relative z-10 text-center">
         <div
           className="inline-block px-6 py-3 mb-6 rounded-lg"
-          style={{ background: `${colors.primary}99` }}
+          style={{ background: `${colors.primary}99` }} 
         >
           <h1 className="text-white text-3xl md:text-5xl font-bold">
             قصص النجاح
@@ -392,6 +421,7 @@ const SuccessStories = () => {
         </div>
       </section>
 
+      
 
       {/* Story Modal */}
       {activeStory && <StoryModal story={activeStory} />}
