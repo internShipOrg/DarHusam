@@ -20,6 +20,11 @@ const SuccessStorySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    //ali addition
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
     createdAt: {
       type: Date,
       default: Date.now,
@@ -33,4 +38,3 @@ const SuccessStorySchema = new mongoose.Schema(
 const SuccessStory = mongoose.model("SuccessStory", SuccessStorySchema);
 
 module.exports = SuccessStory;
-
