@@ -57,7 +57,7 @@ export default function EnhancedNews() {
 
   if (!events.length) {
     return (
-      <div className="flex justify-center items-center h-64">
+      <div className="flex justify-center items-center h-65">
         جارٍ التحميل...
       </div>
     );
