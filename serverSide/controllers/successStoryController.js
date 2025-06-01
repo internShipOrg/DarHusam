@@ -32,3 +32,39 @@ export const deleteSuccessStory = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+//////////////////////////////////////////Ali addition
+// Update story
+export const updateSuccessStory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedStory = await SuccessStory.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
+    res.json(updatedStory);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Soft delete story
+export const softDeleteSuccessStory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await SuccessStory.findByIdAndUpdate(id, { isDeleted: true });
+    res.json({ message: "Success story soft deleted" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Restore soft deleted story
+export const restoreSuccessStory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await SuccessStory.findByIdAndUpdate(id, { isDeleted: false });
+    res.json({ message: "Success story restored" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
