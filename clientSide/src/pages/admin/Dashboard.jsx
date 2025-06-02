@@ -22,6 +22,11 @@ import {
   Bell,
   Settings,
   BarChart2,
+  Video,
+  FileText,
+  Presentation,
+  Newspaper,
+  Trash2,
 } from "lucide-react";
 import Swal from "sweetalert2";
 import AdminForms from "../../components/NewsEvents/AdminForm";
@@ -45,6 +50,8 @@ const Dashboard = () => {
     thumbnailUrl: "",
     tags: "",
     isDownloadable: true,
+    images: [],
+    externalUrl: "",
   });
   const [resources, setResources] = useState([]);
   const navigate = useNavigate();
@@ -114,13 +121,38 @@ const Dashboard = () => {
       formData.append("title", newResource.title);
       formData.append("description", newResource.description);
       formData.append("category", newResource.category);
-      formData.append("tags", newResource.tags);
-      formData.append("isDownloadable", newResource.isDownloadable);
-      if (newResource.file) {
-        formData.append("file", newResource.file);
-      }
-      if (newResource.thumbnailUrl) {
-        formData.append("thumbnailUrl", newResource.thumbnailUrl);
+
+      // منطق رفع الملفات حسب التصنيف
+      if (newResource.category === 'articles') {
+        if (!newResource.images || newResource.images.length === 0) {
+          Swal.fire({
+            title: "خطأ!",
+            text: "يرجى تحميل صورة واحدة على الأقل للمقالة",
+            icon: "error",
+            confirmButtonText: "حسناً",
+            confirmButtonColor: "#780C28",
+          });
+          return;
+        }
+        newResource.images.forEach((image) => {
+          formData.append("images", image);
+        });
+      } else {
+        // فيديو/عرض/PDF: ملف أو رابط
+        if (newResource.file) {
+          formData.append("images", newResource.file); // نستخدم نفس الحقل في الباك
+        } else if (newResource.externalUrl) {
+          formData.append("externalUrl", newResource.externalUrl);
+        } else {
+          Swal.fire({
+            title: "خطأ!",
+            text: "يرجى رفع ملف أو إدخال رابط خارجي",
+            icon: "error",
+            confirmButtonText: "حسناً",
+            confirmButtonColor: "#780C28",
+          });
+          return;
+        }
       }
 
       const response = await axios.post(
@@ -145,17 +177,15 @@ const Dashboard = () => {
         setNewResource({
           title: "",
           description: "",
-          category: "",
+          category: "articles",
+          images: [],
           file: null,
-          thumbnailUrl: "",
-          tags: "",
-          isDownloadable: false,
+          externalUrl: "",
         });
         setShowAddResourceModal(false);
-        axios
-          .get("http://localhost:5000/api/resources")
-          .then((res) => setResources(res.data.data))
-          .catch(() => setResources([]));
+        // Refresh resources list
+        const resourcesResponse = await axios.get("http://localhost:5000/api/resources");
+        setResources(resourcesResponse.data.data || []);
       }
     } catch (error) {
       console.error("Error adding resource:", error);
@@ -1603,119 +1633,89 @@ const Dashboard = () => {
                       </button>
                     </div>
                   </div>
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full bg-white rounded-lg overflow-hidden">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-right text-sm font-semibold text-gray-600">
-                            العنوان
-                          </th>
-                          <th className="px-6 py-3 text-right text-sm font-semibold text-gray-600">
-                            الفئة
-                          </th>
-                          <th className="px-6 py-3 text-right text-sm font-semibold text-gray-600">
-                            الوسوم
-                          </th>
-                          <th className="px-6 py-3 text-right text-sm font-semibold text-gray-600">
-                            الحالة
-                          </th>
-                          <th className="px-6 py-3 text-right text-sm font-semibold text-gray-600">
-                            الإجراءات
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200">
-                        {filterData(resources, searchQuery).map((resource) => (
-                          <tr
-                            key={resource._id}
-                            className="hover:bg-gray-50 transition-colors"
-                          >
-                            <td className="px-6 py-4">
-                              <div className="flex items-center">
-                                {resource.thumbnailUrl ? (
-                                  <img
-                                    src={resource.thumbnailUrl}
-                                    alt={resource.title}
-                                    className="w-10 h-10 rounded-lg object-cover ml-3"
-                                  />
-                                ) : (
-                                  <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center ml-3">
-                                    <BookOpen
-                                      className="text-gray-400"
-                                      size={20}
-                                    />
-                                  </div>
-                                )}
-                                <div>
-                                  <div className="font-medium text-gray-900">
-                                    {resource.title}
-                                  </div>
-                                  <div className="text-sm text-gray-500 line-clamp-1">
-                                    {resource.description}
-                                  </div>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4">
-                              <span className="px-3 py-1 text-xs font-medium bg-[#780C28]/10 text-[#780C28] rounded-full">
-                                {resource.category}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4">
-                              <div className="flex flex-wrap gap-1">
-                                {resource.tags &&
-                                  resource.tags.map((tag, index) => (
-                                    <span
-                                      key={index}
-                                      className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full"
-                                    >
-                                      {tag}
-                                    </span>
-                                  ))}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4">
-                              <span
-                                className={`px-3 py-1 text-xs font-medium rounded-full ${
-                                  resource.isDownloadable
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-gray-100 text-gray-800"
-                                }`}
-                              >
-                                {resource.isDownloadable
-                                  ? "قابل للتحميل"
-                                  : "غير قابل للتحميل"}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-2">
-                                <a
-                                  href={
-                                    resource.fileUrl.startsWith("http")
-                                      ? resource.fileUrl
-                                      : `http://localhost:5000${resource.fileUrl}`
-                                  }
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="px-3 py-1 text-sm bg-[#780C28] text-white rounded hover:bg-opacity-90 transition-colors"
-                                >
-                                  عرض
-                                </a>
-                                <button
-                                  onClick={() =>
-                                    handleDeleteResource(resource._id)
-                                  }
-                                  className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-opacity-90 transition-colors"
-                                >
-                                  حذف
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+
+                  {/* عرض الموارد في شكل بطاقات */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filterData(resources, searchQuery).map((resource) => (
+                      <div
+                        key={resource._id}
+                        className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden"
+                      >
+                        {/* صورة المورد */}
+                        <div className="relative h-48 bg-gray-100">
+                          {resource.images && resource.images.length > 0 ? (
+                            <img
+                              src={resource.images[0].startsWith('http') ? resource.images[0] : `http://localhost:5000${resource.images[0]}`}
+                              alt={resource.title}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                              {resource.category === 'videos' && <Video className="w-12 h-12 text-gray-400" />}
+                              {resource.category === 'pdf' && <FileText className="w-12 h-12 text-gray-400" />}
+                              {resource.category === 'presentations' && <Presentation className="w-12 h-12 text-gray-400" />}
+                              {resource.category === 'articles' && <Newspaper className="w-12 h-12 text-gray-400" />}
+                            </div>
+                          )}
+                          <div className="absolute top-2 right-2">
+                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                              resource.category === 'articles' ? 'bg-blue-100 text-blue-800' :
+                              resource.category === 'videos' ? 'bg-red-100 text-red-800' :
+                              resource.category === 'presentations' ? 'bg-purple-100 text-purple-800' :
+                              'bg-green-100 text-green-800'
+                            }`}>
+                              {resource.category === 'articles' ? 'مقال' :
+                               resource.category === 'videos' ? 'فيديو' :
+                               resource.category === 'presentations' ? 'عرض تقديمي' : 'PDF'}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* محتوى المورد */}
+                        <div className="p-4">
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            {resource.title}
+                          </h3>
+                          <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                            {resource.description}
+                          </p>
+
+                          {/* أزرار الإجراءات */}
+                          <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                            <div className="flex items-center gap-2">
+                              {resource.images && resource.images.length > 0 && (
+                                <span className="text-sm text-gray-500">
+                                  {resource.images.length} صورة
+                                </span>
+                              )}
+                            </div>
+                            <button
+                              onClick={() => handleDeleteResource(resource._id)}
+                              className="flex items-center gap-1 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            >
+                              <Trash2 size={16} />
+                              حذف
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
+
+                  {/* رسالة في حالة عدم وجود موارد */}
+                  {filterData(resources, searchQuery).length === 0 && (
+                    <div className="text-center py-12">
+                      <div className="text-gray-400 mb-4">
+                        <BookOpen size={48} className="mx-auto" />
+                      </div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        لا توجد موارد
+                      </h3>
+                      <p className="text-gray-500">
+                        {searchQuery ? 'لم يتم العثور على موارد تطابق بحثك' : 'قم بإضافة مورد جديد للبدء'}
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -1749,6 +1749,23 @@ const Dashboard = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
+                    التصنيف
+                  </label>
+                  <select
+                    value={newResource.category}
+                    onChange={(e) => setNewResource({ ...newResource, category: e.target.value, images: [], file: null, externalUrl: '' })}
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#780C28] focus:border-[#780C28] transition-all duration-200"
+                    required
+                  >
+                    <option value="articles">مقالات</option>
+                    <option value="videos">فيديوهات</option>
+                    <option value="presentations">عروض تقديمية</option>
+                    <option value="pdf">ملفات PDF</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     الوصف
                   </label>
                   <textarea
@@ -1765,96 +1782,87 @@ const Dashboard = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-6">
+                {/* الحقول الديناميكية حسب التصنيف */}
+                {newResource.category === 'articles' && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      الفئة
-                    </label>
-                    <select
-                      value={newResource.category}
-                      onChange={(e) =>
-                        setNewResource({
-                          ...newResource,
-                          category: e.target.value,
-                        })
-                      }
-                      className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#780C28] focus:border-[#780C28] transition-all duration-200"
-                      required
-                    >
-                      <option value="articles">مقالات</option>
-                      <option value="videos">فيديوهات</option>
-                      <option value="presentations">عروض تقديمية</option>
-                      <option value="pdf">ملفات PDF</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      الملف
+                      الصور
                     </label>
                     <input
                       type="file"
-                      onChange={(e) =>
-                        setNewResource({
-                          ...newResource,
-                          file: e.target.files[0],
-                        })
-                      }
+                      multiple
+                      accept="image/*"
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files);
+                        if (files.length > 10) {
+                          Swal.fire({
+                            title: "خطأ!",
+                            text: "يمكن تحميل 10 صور كحد أقصى",
+                            icon: "error",
+                            confirmButtonText: "حسناً",
+                            confirmButtonColor: "#780C28",
+                          });
+                          return;
+                        }
+                        const oversizedFiles = files.filter(file => file.size > 5 * 1024 * 1024);
+                        if (oversizedFiles.length > 0) {
+                          Swal.fire({
+                            title: "خطأ!",
+                            text: "حجم كل صورة يجب أن لا يتجاوز 5 ميجابايت",
+                            icon: "error",
+                            confirmButtonText: "حسناً",
+                            confirmButtonColor: "#780C28",
+                          });
+                          return;
+                        }
+                        setNewResource({ ...newResource, images: files, file: null, externalUrl: '' });
+                      }}
                       className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#780C28] focus:border-[#780C28] transition-all duration-200"
                       required
                     />
+                    <p className="mt-1 text-sm text-gray-500">
+                      يمكنك اختيار حتى 10 صور. الحد الأقصى لحجم كل صورة هو 5 ميجابايت.
+                    </p>
                   </div>
-                </div>
+                )}
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    صورة مصغرة
-                  </label>
-                  <input
-                    type="text"
-                    value={newResource.thumbnailUrl}
-                    onChange={(e) =>
-                      setNewResource({
-                        ...newResource,
-                        thumbnailUrl: e.target.value,
-                      })
-                    }
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#780C28] focus:border-[#780C28] transition-all duration-200"
-                    placeholder="رابط الصورة المصغرة"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    الوسوم (مفصولة بفواصل)
-                  </label>
-                  <input
-                    type="text"
-                    value={newResource.tags}
-                    onChange={(e) =>
-                      setNewResource({ ...newResource, tags: e.target.value })
-                    }
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#780C28] focus:border-[#780C28] transition-all duration-200"
-                    placeholder="مثال: تعليم، تدريب، تطوير"
-                  />
-                </div>
-
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={newResource.isDownloadable}
-                    onChange={(e) =>
-                      setNewResource({
-                        ...newResource,
-                        isDownloadable: e.target.checked,
-                      })
-                    }
-                    className="ml-2 w-5 h-5 rounded border-gray-300 text-[#780C28] focus:ring-[#780C28]"
-                  />
-                  <label className="text-sm font-medium text-gray-700">
-                    قابل للتحميل
-                  </label>
-                </div>
+                {(newResource.category === 'videos' || newResource.category === 'pdf' || newResource.category === 'presentations') && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {newResource.category === 'videos' ? 'ملف فيديو أو رابط يوتيوب' : newResource.category === 'pdf' ? 'ملف PDF أو رابط خارجي' : 'ملف عرض أو رابط خارجي'}
+                    </label>
+                    <input
+                      type="file"
+                      accept={
+                        newResource.category === 'videos'
+                          ? 'video/*'
+                          : newResource.category === 'pdf'
+                          ? 'application/pdf'
+                          : '.pdf,.ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation'
+                      }
+                      onChange={(e) => {
+                        setNewResource({ ...newResource, file: e.target.files[0], images: [], externalUrl: '' });
+                      }}
+                      className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#780C28] focus:border-[#780C28] transition-all duration-200 mb-2"
+                    />
+                    <input
+                      type="url"
+                      placeholder={
+                        newResource.category === 'videos'
+                          ? 'أدخل رابط يوتيوب أو فيديو خارجي...'
+                          : newResource.category === 'pdf'
+                          ? 'أدخل رابط ملف PDF خارجي...'
+                          : 'أدخل رابط ملف العرض (PDF/PPT) خارجي...'
+                      }
+                      value={newResource.externalUrl || ''}
+                      onChange={(e) => setNewResource({ ...newResource, externalUrl: e.target.value, file: null, images: [] })}
+                      className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#780C28] focus:border-[#780C28] transition-all duration-200"
+                    />
+                    <p className="mt-1 text-sm text-gray-500">
+                      يمكنك رفع ملف أو وضع رابط خارجي (مثل يوتيوب، جوجل درايف، ...)
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end gap-4 mt-8">

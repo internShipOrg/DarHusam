@@ -39,30 +39,50 @@ exports.getResource = async (req, res) => {
 
 exports.addResource = async (req, res) => {
   try {
-    const { title, description, category, tags, isDownloadable } = req.body;
-    let fileUrl = '';
-    let thumbnailUrl = req.body.thumbnailUrl || '';
+    const { title, description, category, externalUrl } = req.body;
+    let images = [];
+    let fileUrl = null;
+    let errors = [];
 
-    // Handle file upload
-    if (req.files && req.files.file) {
-      const file = req.files.file[0];
-      fileUrl = `/uploads/${file.filename}`;
+    // التحقق من الحقول المطلوبة
+    if (!title || !description || !category) {
+      return res.status(400).json({
+        success: false,
+        message: 'العنوان والوصف والتصنيف مطلوبون'
+      });
     }
 
-    // Handle thumbnail upload
-    if (req.files && req.files.thumbnail) {
-      const thumbnail = req.files.thumbnail[0];
-      thumbnailUrl = `/uploads/${thumbnail.filename}`;
+    // مقالات: صور فقط
+    if (category === 'articles') {
+      if (!req.files || req.files.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'يرجى تحميل صورة واحدة على الأقل للمقالة'
+        });
+      }
+      req.files.forEach(file => {
+        images.push(`/uploads/${file.filename}`);
+      });
+    } else {
+      // فيديوهات أو PDF أو عروض: ملف واحد أو رابط خارجي
+      if (req.files && req.files.length > 0) {
+        // ملف واحد فقط
+        fileUrl = `/uploads/${req.files[0].filename}`;
+      } else if (!externalUrl) {
+        return res.status(400).json({
+          success: false,
+          message: 'يرجى رفع ملف أو إدخال رابط خارجي'
+        });
+      }
     }
 
     const resource = await Resource.create({
       title,
       description,
       category,
+      images,
       fileUrl,
-      thumbnailUrl,
-      tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
-      isDownloadable: isDownloadable === 'true'
+      externalUrl: externalUrl || undefined
     });
 
     res.status(201).json({
@@ -70,19 +90,18 @@ exports.addResource = async (req, res) => {
       data: resource
     });
   } catch (error) {
-    // Clean up uploaded files if resource creation fails
+    // حذف الملفات إذا حدث خطأ
     if (req.files) {
-      Object.values(req.files).forEach(files => {
-        files.forEach(file => {
-          fs.unlink(file.path, err => {
-            if (err) console.error('Error deleting file:', err);
-          });
-        });
+      req.files.forEach(file => {
+        const filePath = path.join(__dirname, '..', 'uploads', file.filename);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
       });
     }
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message || 'حدث خطأ أثناء إضافة المورد'
     });
   }
 };
@@ -124,11 +143,21 @@ exports.deleteResource = async (req, res) => {
         message: 'Resource not found'
       });
     }
+
+    // Delete associated images
+    resource.images.forEach(imagePath => {
+      const fullPath = path.join(__dirname, '..', imagePath);
+      if (fs.existsSync(fullPath)) {
+        fs.unlinkSync(fullPath);
+      }
+    });
+
     resource.isDeleted = true;
     await resource.save();
+    
     res.status(200).json({
       success: true,
-      message: 'Resource soft deleted successfully'
+      message: 'Resource deleted successfully'
     });
   } catch (error) {
     res.status(500).json({

@@ -62,7 +62,7 @@ export default function ProgramsSlider() {
     <div className="relative py-16 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
       <div className="max-w-6xl mx-auto px-4">
         {/* Section header */}
-        <div className="text-center mb-12 relative">
+        <div className="text-center mb-10 relative">
           <h2 className="text-4xl font-extrabold" style={{ color: "#780C28" }}>
             برامجنا
           </h2>

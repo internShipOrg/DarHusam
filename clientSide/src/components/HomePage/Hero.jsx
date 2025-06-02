@@ -1,6 +1,9 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 
 export default function HeroSection() {
+   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   
   return (
@@ -28,21 +31,24 @@ export default function HeroSection() {
             
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-4">
               <button
-                className="w-full sm:w-auto px-6 sm:px-8 py-3 rounded-lg text-base sm:text-lg font-medium transition-all duration-300 text-center"
-                style={{ 
-                  backgroundColor: isHovered ? '#6E8E59' : '#780C28',
-                  color: 'white'
-                }}
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-              >
-                اكتشف برامجنا
-              </button>
-              <button
-                className="w-full sm:w-auto px-6 sm:px-8 py-3 rounded-lg text-base sm:text-lg font-medium transition-all duration-300 border-2 border-[#780C28] text-[#780C28] hover:bg-[#780C28] hover:text-white text-center"
-              >
-                سجل الآن
-              </button>
+        className="w-full sm:w-auto px-6 sm:px-8 py-3 rounded-lg text-base sm:text-lg font-medium transition-all duration-300 text-center"
+        style={{ 
+          backgroundColor: isHovered ? '#6E8E59' : '#780C28',
+          color: 'white'
+        }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={() => navigate('/training-programs')}   
+      >
+        اكتشف برامجنا
+      </button>
+
+      <button
+        className="w-full sm:w-auto px-6 sm:px-8 py-3 rounded-lg text-base sm:text-lg font-medium transition-all duration-300 border-2 border-[#780C28] text-[#780C28] hover:bg-[#780C28] hover:text-white text-center"
+        onClick={() => navigate('/join-us')}   
+      >
+        سجل الآن
+      </button>
             </div>
           </div>
           
