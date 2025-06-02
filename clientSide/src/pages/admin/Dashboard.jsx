@@ -304,7 +304,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex" dir="rtl">
+    <div className="min-h-screen bg-gray-50 flex mb-4" dir="rtl">
       {/* Sidebar */}
       <div
         className={`fixed inset-y-0 right-0 z-50 w-72 bg-gradient-to-b from-[#780C28] to-[#4A0719] shadow-xl transform transition-transform duration-300 ease-in-out ${
@@ -316,29 +316,43 @@ const Dashboard = () => {
             <h2 className="text-2xl font-bold text-white">دار حسام</h2>
             <p className="text-white/70 text-sm mt-1">لوحة التحكم</p>
           </div>
-          <nav className="flex-1 p-4 space-y-2">
-            {menuItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center p-4 rounded-xl transition-all duration-200 ${
-                  activeTab === item.id
-                    ? "bg-white/10 text-white shadow-lg"
-                    : "text-white/70 hover:bg-white/5 hover:text-white"
-                }`}
-              >
-                <item.icon className="ml-3" size={20} />
-                {item.label}
-              </button>
-            ))}
+
+          {/* Navigation Menu with improved scrolling */}
+          <nav
+            className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30"
+            dir="rtl"
+            style={{
+              maxHeight: "calc(100vh - 180px)",
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgba(255, 255, 255, 0.2) transparent",
+              direction: "ltr" // This will move the scrollbar to the right
+            }}
+          >
+            <div className="p-4 space-y-2" style={{ direction: "rtl" }}> {/* Keep content RTL */}
+              {menuItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`w-full flex items-center p-4 rounded-xl transition-all duration-200 ${
+                    activeTab === item.id
+                      ? "bg-white/20 text-white shadow-lg"
+                      : "text-white/80 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  <item.icon className="ml-3" size={20} />
+                  <span className="flex-1 text-right">{item.label}</span>
+                </button>
+              ))}
+            </div>
           </nav>
+
           <div className="p-4 border-t border-white/10">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center p-4 text-white/70 hover:text-white hover:bg-white/5 rounded-xl transition-all duration-200"
+              className="w-full flex items-center p-4 text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-200"
             >
               <LogOut className="ml-3" size={20} />
-              تسجيل الخروج
+              <span className="flex-1 text-right">تسجيل الخروج</span>
             </button>
           </div>
         </div>

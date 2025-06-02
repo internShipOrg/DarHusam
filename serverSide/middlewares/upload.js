@@ -26,17 +26,26 @@ const storage = multer.diskStorage({
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     const ext = path.extname(file.originalname);
-    // Ensure consistent filename format
-    cb(null, "image-" + uniqueSuffix + ext);
+    // Use appropriate prefix based on file type
+    const prefix = file.mimetype.startsWith('video/') ? 'video-' : 'image-';
+    cb(null, prefix + uniqueSuffix + ext);
   },
 });
 // File filter
 const fileFilter = function (req, file, cb) {
-  const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    "video/mp4",
+    "video/webm",
+    "video/ogg"
+  ];
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Only image files are allowed (jpeg, png, gif, webp)"), false);
+    cb(new Error("Only image and video files are allowed (jpeg, png, gif, webp, mp4, webm, ogg)"), false);
   }
 };
 
@@ -44,7 +53,7 @@ const fileFilter = function (req, file, cb) {
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
+    fileSize: 50 * 1024 * 1024, // 50MB limit for videos
   },
   fileFilter: fileFilter,
 });

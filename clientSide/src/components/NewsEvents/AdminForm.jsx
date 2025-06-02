@@ -205,32 +205,48 @@ const AdminForms = () => {
           headers: {
             "Content-Type": "multipart/form-data",
           },
+          timeout: 30000,
+          validateStatus: function (status) {
+            return status >= 200 && status < 500;
+          }
         }
       );
 
-      Swal.fire({
-        title: "تمت الإضافة بنجاح",
-        text: "تمت إضافة الوسائط بنجاح",
-        icon: "success",
-        confirmButtonText: "حسناً",
-        confirmButtonColor: "#780C28",
-      });
+      if (response.data.success) {
+        Swal.fire({
+          title: "تمت الإضافة بنجاح",
+          text: "تمت إضافة الوسائط بنجاح",
+          icon: "success",
+          confirmButtonText: "حسناً",
+          confirmButtonColor: "#780C28",
+        });
 
-      setMediaForm({
-        title: "",
-        description: "",
-        type: "image",
-        file: null,
-      });
+        setMediaForm({
+          title: "",
+          description: "",
+          type: "image",
+          file: null,
+        });
+      } else {
+        throw new Error(response.data.message || "حدث خطأ أثناء إضافة الوسائط");
+      }
     } catch (error) {
+      console.error("Error adding media:", error);
+      let errorMessage = "حدث خطأ أثناء إضافة الوسائط";
+      
+      if (error.code === 'ERR_NETWORK') {
+        errorMessage = "فشل الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت وإعادة المحاولة.";
+      } else if (error.response) {
+        errorMessage = error.response.data.message || errorMessage;
+      }
+
       Swal.fire({
         title: "خطأ",
-        text: "حدث خطأ أثناء إضافة الوسائط",
+        text: errorMessage,
         icon: "error",
         confirmButtonText: "حسناً",
         confirmButtonColor: "#780C28",
       });
-      console.error("Error adding media:", error);
     }
   };
 
