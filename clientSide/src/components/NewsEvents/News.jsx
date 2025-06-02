@@ -611,6 +611,25 @@
 //     </div>
 //   );
 // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import { useState, useEffect } from "react";
 import {
   ChevronRight,
@@ -830,11 +849,10 @@ export default function News() {
           <div className="flex space-x-6 space-x-reverse">
             <button
               onClick={() => changeSection("articles")}
-              className={`px-6 py-4 flex items-center gap-2 transition-all relative ${
-                activeSection === "articles"
+              className={`px-6 py-4 flex items-center gap-2 transition-all relative ${activeSection === "articles"
                   ? "text-gray-800 font-medium"
                   : "text-gray-500 hover:text-gray-800"
-              }`}
+                }`}
             >
               <FileText size={18} />
               <span>المقالات والتقارير</span>
@@ -847,11 +865,10 @@ export default function News() {
             </button>
             <button
               onClick={() => changeSection("events")}
-              className={`px-6 py-4 flex items-center gap-2 transition-all relative ${
-                activeSection === "events"
+              className={`px-6 py-4 flex items-center gap-2 transition-all relative ${activeSection === "events"
                   ? "text-gray-800 font-medium"
                   : "text-gray-500 hover:text-gray-800"
-              }`}
+                }`}
             >
               <Calendar size={18} />
               <span>الفعاليات القادمة</span>
@@ -864,11 +881,10 @@ export default function News() {
             </button>
             <button
               onClick={() => changeSection("media")}
-              className={`px-6 py-4 flex items-center gap-2 transition-all relative ${
-                activeSection === "media"
+              className={`px-6 py-4 flex items-center gap-2 transition-all relative ${activeSection === "media"
                   ? "text-gray-800 font-medium"
                   : "text-gray-500 hover:text-gray-800"
-              }`}
+                }`}
             >
               <Image size={18} />
               <span>الصور والفيديو</span>
@@ -887,13 +903,12 @@ export default function News() {
       <div className="flex-1 relative overflow-hidden">
         {/* Articles Section */}
         <div
-          className={`absolute inset-0 transition-all duration-500 ease-in-out overflow-auto ${
-            activeSection === "articles"
+          className={`absolute inset-0 transition-all duration-500 ease-in-out overflow-auto ${activeSection === "articles"
               ? "translate-x-0 opacity-100"
               : animationDirection === "right"
-              ? "translate-x-full opacity-0"
-              : "-translate-x-full opacity-0"
-          } ${showDetails ? "hidden" : "block"}`}
+                ? "translate-x-full opacity-0"
+                : "-translate-x-full opacity-0"
+            } ${showDetails ? "hidden" : "block"}`}
         >
           {loading.articles ? (
             <LoadingSkeleton />
@@ -1078,13 +1093,12 @@ export default function News() {
 
         {/* Events Section */}
         <div
-          className={`absolute inset-0 transition-all duration-500 ease-in-out overflow-auto ${
-            activeSection === "events"
+          className={`absolute inset-0 transition-all duration-500 ease-in-out overflow-auto ${activeSection === "events"
               ? "translate-x-0 opacity-100"
               : animationDirection === "right"
-              ? "translate-x-full opacity-0"
-              : "-translate-x-full opacity-0"
-          }`}
+                ? "translate-x-full opacity-0"
+                : "-translate-x-full opacity-0"
+            }`}
         >
           {loading.events ? (
             <div className="p-6 space-y-6">
@@ -1197,13 +1211,12 @@ export default function News() {
 
         {/* Media Section */}
         <div
-          className={`absolute inset-0 transition-all duration-500 ease-in-out overflow-auto ${
-            activeSection === "media"
+          className={`absolute inset-0 transition-all duration-500 ease-in-out overflow-auto ${activeSection === "media"
               ? "translate-x-0 opacity-100"
               : animationDirection === "right"
-              ? "translate-x-full opacity-0"
-              : "-translate-x-full opacity-0"
-          }`}
+                ? "translate-x-full opacity-0"
+                : "-translate-x-full opacity-0"
+            }`}
         >
           {loading.media ? (
             <div className="p-6">
@@ -1231,13 +1244,18 @@ export default function News() {
                     className="relative group rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all cursor-pointer"
                   >
                     <img
-                      src={item.type === "video" ? item.thumbnail : item.url}
+                      src={
+                        (item.type === "video" ? item.thumbnail : item.url).startsWith("http")
+                          ? (item.type === "video" ? item.thumbnail : item.url)
+                          : `http://localhost:5000${item.type === "video" ? item.thumbnail : item.url}`
+                      }
                       alt={item.title}
-                      className="w-full h-64 object-cover"
+                      className="w-full h-full object-cover transition-all duration-500 hover:scale-105"
                       onError={(e) => {
                         e.target.src = "/placeholder-image.jpg";
                       }}
                     />
+
                     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all flex items-center justify-center">
                       {item.type === "video" && (
                         <div className="w-16 h-16 rounded-full bg-white bg-opacity-75 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all transform scale-90 group-hover:scale-100">

@@ -115,9 +115,12 @@ export default function EnhancedNews() {
                   <h3 className="text-xl font-bold mb-2 text-[#780C28] line-clamp-2">
                     {evt.title}
                   </h3>
-                  <p className="text-gray-600 mb-3 text-sm flex-grow line-clamp-3">
-                    {evt.description}
+                  <p className="text-gray-600 mb-3 text-sm flex-grow">
+                    {evt.description.length > 100
+                      ? `${evt.description.substring(0, 100)}…`
+                      : evt.description}
                   </p>
+
 
                   <div className="bg-gradient-to-r from-[#780C28] to-[#a01040] text-white p-3 rounded-lg mb-4 text-center">
                     <div className="text-xs opacity-90">التاريخ</div>
@@ -209,11 +212,10 @@ export default function EnhancedNews() {
             <button
               key={idx}
               onClick={() => setCurrentPage(idx)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                currentPage === idx
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${currentPage === idx
                   ? "bg-[#780C28] w-6"
                   : "bg-gray-300 hover:bg-gray-400"
-              }`}
+                }`}
             />
           ))}
         </div>
