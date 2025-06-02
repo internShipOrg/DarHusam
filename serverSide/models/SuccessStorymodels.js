@@ -16,11 +16,6 @@ const SuccessStorySchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    videoUrl: {
-      type: String,
-      required: true,
-    },
-    //ali addition
     isDeleted: {
       type: Boolean,
       default: false,

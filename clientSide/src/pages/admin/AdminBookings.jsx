@@ -1,7 +1,8 @@
 // components/Bookings/AdminBookings.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Search, CalendarDays, Home, Trash2, Filter, X } from "lucide-react";
+import { Search, CalendarDays, Home, Trash2, Filter, X, Clock, Mail, Phone } from "lucide-react";
+import Swal from 'sweetalert2';
 
 const AdminBookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -58,15 +59,40 @@ const AdminBookings = () => {
 
   const handleDelete = async (id) => {
     try {
-      if (!window.confirm("هل أنت متأكد من حذف هذا الحجز؟")) return;
-
-      const token = localStorage.getItem("adminToken");
-      await axios.delete(`http://localhost:5000/api/bookings/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const result = await Swal.fire({
+        title: 'هل أنت متأكد من حذف هذا الحجز؟',
+        text: "لا يمكن التراجع عن هذا الإجراء!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#780C28',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'نعم، احذف الحجز',
+        cancelButtonText: 'إلغاء',
+        reverseButtons: true
       });
-      fetchData();
+
+      if (result.isConfirmed) {
+        const token = localStorage.getItem("adminToken");
+        await axios.delete(`http://localhost:5000/api/bookings/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        
+        await Swal.fire({
+          title: 'تم الحذف!',
+          text: 'تم حذف الحجز بنجاح.',
+          icon: 'success',
+          confirmButtonColor: '#780C28'
+        });
+        
+        fetchData();
+      }
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to delete booking");
+      Swal.fire({
+        title: 'خطأ!',
+        text: err.response?.data?.message || 'حدث خطأ أثناء حذف الحجز',
+        icon: 'error',
+        confirmButtonColor: '#780C28'
+      });
     }
   };
 
@@ -84,58 +110,31 @@ const AdminBookings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
-      <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className="min-h-screen bg-[#EAFAEA]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header Section */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 mb-8">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-[#780C28] rounded-xl">
-                <CalendarDays className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h2 className="text-3xl font-bold text-[#780C28]">
-                  إدارة الحجوزات
-                </h2>
-                <p className="text-gray-500 mt-1">عرض وإدارة جميع الحجوزات</p>
-              </div>
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <div className="flex items-center gap-4">
+            <div className="p-2 bg-[#780C28] rounded-lg">
+              <CalendarDays className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-[#780C28]">إدارة الحجوزات</h2>
+              <p className="text-gray-500 text-sm">عرض وإدارة جميع الحجوزات</p>
             </div>
           </div>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 rounded-r-xl shadow-md animate-pulse">
-            <div className="flex">
-              <div className="ml-3">
-                <p className="text-red-800 font-medium">{error}</p>
-              </div>
-            </div>
+          <div className="mb-6 p-4 bg-red-50 border-r-4 border-red-400 rounded-lg">
+            <p className="text-red-800">{error}</p>
           </div>
         )}
 
         {/* Filter Section */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* <div className="relative">
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <Home className="w-5 h-5 text-gray-400" />
-              </div>
-              <select
-                name="hallId"
-                value={filters.hallId}
-                onChange={handleFilterChange}
-                className="w-full px-4 py-2 pr-10 border rounded-lg focus:border-[#780C28] focus:ring-1 focus:ring-[#780C28]/50"
-              >
-                <option value="">كل القاعات</option>
-                {halls.map((hall) => (
-                  <option key={hall.id} value={hall.id}>
-                    {hall.name}
-                  </option>
-                ))}
-              </select>
-            </div> */}
-
+        <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="relative">
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                 <CalendarDays className="w-5 h-5 text-gray-400" />
@@ -145,7 +144,7 @@ const AdminBookings = () => {
                 name="date"
                 value={filters.date}
                 onChange={handleFilterChange}
-                className="w-full px-4 py-2 pr-10 border rounded-lg focus:border-[#780C28] focus:ring-1 focus:ring-[#780C28]/50"
+                className="w-full px-4 py-2 pr-10 border border-gray-200 rounded-lg focus:border-[#780C28] focus:ring-1 focus:ring-[#780C28]/50"
               />
             </div>
 
@@ -159,31 +158,29 @@ const AdminBookings = () => {
                 value={filters.search}
                 onChange={handleFilterChange}
                 placeholder="بحث بالاسم أو الهاتف أو الإيميل"
-                className="w-full px-4 py-2 pr-10 border rounded-lg focus:border-[#780C28] focus:ring-1 focus:ring-[#780C28]/50"
+                className="w-full px-4 py-2 pr-10 border border-gray-200 rounded-lg focus:border-[#780C28] focus:ring-1 focus:ring-[#780C28]/50"
               />
             </div>
 
             <button
               onClick={clearFilters}
-              className="flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+              className="flex items-center justify-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
             >
-              <X className="w-5 h-5 mr-2" />
+              <X className="w-5 h-5 ml-2" />
               مسح الفلتر
             </button>
           </div>
         </div>
 
         {/* Bookings List */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           {loading ? (
-            <div className="p-12 text-center">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#780C28] border-t-transparent"></div>
-              <p className="mt-4 text-gray-600 text-lg">
-                جاري تحميل الحجوزات...
-              </p>
+            <div className="p-8 text-center">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#780C28] border-t-transparent"></div>
+              <p className="mt-3 text-gray-600">جاري تحميل الحجوزات...</p>
             </div>
           ) : bookings.length === 0 ? (
-            <div className="p-6 text-center text-gray-500">
+            <div className="p-8 text-center text-gray-500">
               لا توجد حجوزات متطابقة مع معايير البحث
             </div>
           ) : (
@@ -191,44 +188,61 @@ const AdminBookings = () => {
               {bookings.map((booking) => (
                 <div
                   key={booking._id}
-                  className="p-6 hover:bg-gray-50 transition-colors duration-200"
+                  className="p-4 hover:bg-gray-50 transition-colors"
                 >
-                  <div className="flex justify-between items-start">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="flex-1">
-                      <div className="flex items-center space-x-4 mb-3">
-                        <div className="p-2 bg-[#780C28]/10 rounded-lg">
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 bg-[#780C28]/10 rounded-lg mt-1">
                           <CalendarDays className="text-[#780C28] w-5 h-5" />
                         </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-gray-800">
-                            {booking.fullName}
-                            <span className="ml-3 text-sm font-normal text-gray-500">
+                        <div className="flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              {booking.fullName}
+                            </h3>
+                            <span className="text-sm text-gray-500">
                               {booking.hallName}
                             </span>
-                          </h3>
-                          <div className="flex flex-wrap gap-2 mt-2">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                              {booking.date}
-                            </span>
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              {booking.time}
-                            </span>
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                              {booking.phone}
-                            </span>
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                              {booking.email}
-                            </span>
                           </div>
+                          
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            <div className="flex items-center text-sm text-gray-600">
+                              <CalendarDays className="w-4 h-4 ml-1 text-[#780C28]" />
+                              {booking.date}
+                            </div>
+                            <div className="flex items-center text-sm text-gray-600">
+                              <Clock className="w-4 h-4 ml-1 text-[#780C28]" />
+                              {booking.time}
+                            </div>
+                            <div className="flex items-center text-sm text-gray-600">
+                              <Phone className="w-4 h-4 ml-1 text-[#780C28]" />
+                              {booking.phone}
+                            </div>
+                            <div className="flex items-center text-sm text-gray-600">
+                              <Mail className="w-4 h-4 ml-1 text-[#780C28]" />
+                              {booking.email}
+                            </div>
+                          </div>
+
                           {booking.notes && (
-                            <p className="mt-3 text-gray-600 bg-gray-50 p-3 rounded-lg">
+                            <p className="mt-2 text-sm text-gray-600 bg-gray-50 p-2 rounded-lg">
                               {booking.notes}
                             </p>
                           )}
                         </div>
                       </div>
                     </div>
-                    <div className="flex space-x-2"></div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleDelete(booking._id)}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="حذف الحجز"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
