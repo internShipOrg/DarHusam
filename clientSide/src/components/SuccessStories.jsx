@@ -6,6 +6,11 @@ const SuccessStories = () => {
   const [activeStory, setActiveStory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [submitForm, setSubmitForm] = useState({ name: '', image: null, shortStory: '' });
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   // Color scheme - refined palette
   const colors = {
@@ -23,7 +28,6 @@ const SuccessStories = () => {
       name: "محمد علي",
       title: "صاحب مشروع ناجح",
       imageUrl: "/api/placeholder/400/300",
-      videoUrl: "/api/placeholder/video",
       shortStory:
         "بدعم من دار الحسام، استطاع محمد إنشاء مشروعه التجاري الخاص وتحقيق الاستقلال المالي.",
       fullStory:
@@ -36,7 +40,6 @@ const SuccessStories = () => {
       name: "سارة أحمد",
       title: "مدربة حرف يدوية",
       imageUrl: "/api/placeholder/400/300",
-      videoUrl: "/api/placeholder/video",
       shortStory:
         "سارة وجدت الأمل من جديد بعد مشاركتها في برامج التأهيل المهني التي قدمتها دار الحسام.",
       fullStory:
@@ -49,7 +52,6 @@ const SuccessStories = () => {
       name: "خالد يوسف",
       title: "قائد مجتمعي",
       imageUrl: "/api/placeholder/400/300",
-      videoUrl: "/api/placeholder/video",
       shortStory:
         "بفضل الدورات التدريبية، أصبح خالد مدرباً معتمداً وقائداً مجتمعياً مميزاً.",
       fullStory:
@@ -62,7 +64,6 @@ const SuccessStories = () => {
       name: "ليلى حسن",
       title: "خبيرة تكنولوجيا المعلومات",
       imageUrl: "/api/placeholder/400/300",
-      videoUrl: "/api/placeholder/video",
       shortStory:
         "انتقلت ليلى من البطالة إلى العمل في مجال التكنولوجيا بفضل برامج التدريب المتخصصة.",
       fullStory:
@@ -72,60 +73,72 @@ const SuccessStories = () => {
     },
   ];
 
-  // useEffect(() => {
-  //   const fetchStories = async () => {
-  //     setLoading(true);
-  //     try {
-  //       // Attempt to fetch from API
-  //       const response = await fetch(
-  //         "http://localhost:5000/api/success-stories"
-  //       );
-  //       const data = await response.json();
-
-  //       if (data.length === 0) {
-  //         setStories(dummyStories);
-  //       } else {
-  //         setStories(data);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching stories:", error);
-  //       setStories(dummyStories);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchStories();
-  // }, []);
-
   useEffect(() => {
-  const fetchStories = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch("http://localhost:5000/api/success-stories");
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      if (!Array.isArray(data) || data.length === 0) {
+    const fetchStories = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get("http://localhost:5000/api/success");
+        if (response.data && response.data.length > 0) {
+          setStories(response.data);
+        } else {
+          setStories(dummyStories);
+        }
+      } catch (error) {
+        console.error("Error fetching stories:", error);
+        setError("حدث خطأ أثناء تحميل قصص النجاح");
         setStories(dummyStories);
-      } else {
-        setStories(data);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching stories:", error);
-      setStories(dummyStories);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  fetchStories();
-}, []);
-
+    fetchStories();
+  }, []);
 
   const closeStoryDetails = () => {
     setActiveStory(null);
+  };
+
+  // Handle form input changes
+  const handleSubmitInput = (e) => {
+    const { name, value, files } = e.target;
+    if (name === 'image') {
+      setSubmitForm((prev) => ({ ...prev, image: files[0] }));
+    } else {
+      setSubmitForm((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  // Handle submit
+  const handleSubmitStory = async (e) => {
+    e.preventDefault();
+    setSubmitLoading(true);
+    setSubmitError('');
+    try {
+      let imageUrl = '';
+      if (submitForm.image) {
+        const formData = new FormData();
+        formData.append('image', submitForm.image);
+        const uploadRes = await axios.post('http://localhost:5000/api/upload', formData);
+        imageUrl = uploadRes.data.imageUrl;
+      }
+      await axios.post('http://localhost:5000/api/success', {
+        name: submitForm.name,
+        imageUrl,
+        shortStory: submitForm.shortStory,
+      });
+      setSubmitSuccess(true);
+      setTimeout(() => {
+        setShowSubmitModal(false);
+        setSubmitSuccess(false);
+        setSubmitForm({ name: '', image: null, shortStory: '' });
+        fetchStories();
+      }, 1800);
+    } catch (err) {
+      setSubmitError('حدث خطأ أثناء إرسال القصة. حاول مرة أخرى.');
+    } finally {
+      setSubmitLoading(false);
+    }
   };
 
   // Custom component for the hero section
@@ -167,64 +180,23 @@ const SuccessStories = () => {
   // Custom card component
   const StoryCard = ({ story }) => (
     <div
-      className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
-      style={{ borderTop: `5px solid ${colors.primary}` }}
+      className="bg-white rounded-xl border border-gray-200 p-6 flex flex-col items-center text-center shadow-sm hover:shadow-md transition-all duration-200"
+      style={{ minHeight: 320 }}
     >
-      <div className="relative">
-        <img
-          src={story.imageUrl}
-          alt={story.name}
-          className="w-full h-64 object-cover"
-          onError={(e) => {
-            e.target.src = "/placeholder-image.jpg";
-          }}
-        />
-        <div
-          className="absolute top-4 left-4 px-3 py-1 rounded-full text-white text-sm font-semibold shadow-md"
-          style={{ background: colors.contrast }}
-        >
-          قصة نجاح
-        </div>
-        <div
-          className="absolute bottom-0 left-0 right-0 py-3 px-4"
-          style={{
-            background: `linear-gradient(to top, rgba(0,0,0,0.8), transparent)`,
-          }}
-        >
-          <h2 className="text-white text-xl font-bold">{story.name}</h2>
-          <p className="text-gray-200 text-sm">{story.title}</p>
-        </div>
-      </div>
-
-      <div className="p-6 bg-white">
-        <p
-          className="text-gray-700 leading-relaxed mb-6"
-          style={{ minHeight: "100px" }}
-        >
-          {story.shortStory}
-        </p>
-        <button
-          className="font-medium flex items-center text-sm transition duration-300 border-b-2 border-transparent hover:border-current pb-1"
-          style={{ color: colors.contrast }}
-          onClick={() => setActiveStory(story)}
-        >
-          قراءة المزيد
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4 mr-1 rotate-180"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </button>
-      </div>
+      <img
+        src={story.imageUrl && story.imageUrl.startsWith('http') ? story.imageUrl : `http://localhost:5000/${story.imageUrl?.replace(/^\/+/,'')}`}
+        alt={story.name}
+        className="w-24 h-24 rounded-full object-cover border-4 border-gray-100 mb-4 shadow"
+        onError={e => { e.target.src = "/placeholder-image.jpg"; }}
+      />
+      <h2 className="text-lg font-bold text-gray-800 mb-2">{story.name}</h2>
+      <p className="text-gray-500 text-sm mb-4 line-clamp-3" style={{minHeight: 60}}>{story.shortStory}</p>
+      <button
+        className="px-5 py-2 rounded-full bg-[#4D7C4D] text-white text-sm font-medium hover:bg-[#3a5e3a] transition"
+        onClick={() => setActiveStory(story)}
+      >
+        قراءة المزيد
+      </button>
     </div>
   );
 
@@ -242,105 +214,61 @@ const SuccessStories = () => {
   // Enhanced story modal
   const StoryModal = ({ story }) => (
     <div
-      className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
       style={{ direction: "rtl" }}
       onClick={closeStoryDetails}
     >
       <div
-        className="bg-white rounded-lg w-full max-w-3xl max-h-90vh overflow-y-auto"
-        style={{ borderTop: `5px solid ${colors.primary}` }}
-        onClick={(e) => e.stopPropagation()}
+        className="bg-white rounded-2xl w-full max-w-md mx-auto p-6 relative flex flex-col items-center text-center shadow-lg"
+        onClick={e => e.stopPropagation()}
       >
-        <div className="relative">
-          <img
-            src={story.imageUrl}
-            alt={story.name}
-            className="w-full h-80 object-cover"
-            onError={(e) => {
-              e.target.src = "/placeholder-image.jpg";
-            }}
-          />
-          <button
-            className="absolute top-4 left-4 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition-colors"
-            onClick={closeStoryDetails}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke={colors.contrast}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-          <div
-            className="absolute bottom-0 left-0 right-0 p-6"
-            style={{
-              background:
-                "linear-gradient(to top, rgba(0,0,0,0.8), transparent)",
-            }}
-          >
-            <h2 className="text-white text-3xl font-bold mb-1">{story.name}</h2>
-            <p className="text-gray-200">{story.title}</p>
-          </div>
-        </div>
+        <button
+          className="absolute top-3 left-3 bg-gray-100 rounded-full p-2 hover:bg-gray-200"
+          onClick={closeStoryDetails}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="#4D7C4D"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+        <img
+          src={story.imageUrl && story.imageUrl.startsWith('http') ? story.imageUrl : `http://localhost:5000/${story.imageUrl?.replace(/^\/+/,'')}`}
+          alt={story.name}
+          className="w-28 h-28 rounded-full object-cover border-4 border-gray-100 mb-4 shadow"
+          onError={e => { e.target.src = "/placeholder-image.jpg"; }}
+        />
+        <h2 className="text-xl font-bold text-gray-800 mb-2">{story.name}</h2>
+        <p className="text-gray-600 mb-4" style={{fontWeight: 500}}>{story.title}</p>
+        <p className="text-gray-700 leading-relaxed mb-4 text-base">{story.fullStory || story.shortStory}</p>
+        {story.testimonial && (
+          <div className="bg-[#F5FAF5] rounded-lg p-4 text-gray-700 text-sm italic mb-2 border border-[#B3D1A3]">"{story.testimonial}"</div>
+        )}
+        <button
+          className="mt-2 px-6 py-2 rounded-full bg-[#4D7C4D] text-white text-sm font-medium hover:bg-[#3a5e3a] transition"
+          onClick={closeStoryDetails}
+        >
+          إغلاق
+        </button>
+      </div>
+    </div>
+  );
 
-        <div className="p-8">
-          <div className="mb-8">
-            <h3
-              className="text-2xl font-semibold mb-4"
-              style={{ color: colors.primary }}
-            >
-              القصة كاملة
-            </h3>
-            <p className="text-gray-700 leading-relaxed text-lg mb-6">
-              {story.fullStory || story.shortStory}
-            </p>
-          </div>
-
-          {story.testimonial && (
-            <div
-              className="p-6 rounded-lg mb-6 relative"
-              style={{ backgroundColor: colors.lightAccent }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill={`${colors.primary}40`}
-                className="absolute top-4 right-4 w-16 h-16"
-              >
-                <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-              </svg>
-              <p className="text-gray-700 italic text-lg relative z-10">
-                "{story.testimonial}"
-              </p>
-              <div className="flex justify-end mt-4">
-                <p className="font-bold" style={{ color: colors.primary }}>
-                  {story.name}
-                </p>
-              </div>
-            </div>
-          )}
-
-          <div className="flex justify-between items-center pt-6 border-t border-gray-200">
-            <span className="text-sm text-gray-500">
-              دار الحسام للخدمات المجتمعية
-            </span>
-            <button
-              className="px-6 py-3 rounded-md text-white text-sm font-medium transition duration-300 hover:shadow-lg"
-              style={{ background: colors.primary }}
-              onClick={closeStoryDetails}
-            >
-              العودة للصفحة الرئيسية
-            </button>
-          </div>
-        </div>
+  // Modal for submitting a story
+  const SubmitStoryModal = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50" onClick={() => setShowSubmitModal(false)}>
+      <div className="bg-white rounded-2xl w-full max-w-md mx-auto p-6 relative flex flex-col items-center text-center shadow-lg" onClick={e => e.stopPropagation()}>
+        <button className="absolute top-3 left-3 bg-gray-100 rounded-full p-2 hover:bg-gray-200" onClick={() => setShowSubmitModal(false)}>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="#4D7C4D"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+        <h2 className="text-xl font-bold text-gray-800 mb-4">شارك قصتك الملهمة</h2>
+        {submitSuccess ? (
+          <div className="bg-green-100 text-green-800 rounded-lg p-4 mb-2 font-medium animate-fade-in">تم إرسال قصتك بنجاح! سيتم مراجعتها قريباً.</div>
+        ) : (
+        <form className="w-full space-y-4" onSubmit={handleSubmitStory}>
+          <input type="text" name="name" required placeholder="اسمك" value={submitForm.name} onChange={handleSubmitInput} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D7C4D]" />
+          <input type="file" name="image" accept="image/*" onChange={handleSubmitInput} className="w-full px-4 py-2 border rounded-lg" />
+          <textarea name="shortStory" required placeholder="اكتب قصتك بإيجاز..." value={submitForm.shortStory} onChange={handleSubmitInput} rows="4" className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D7C4D] resize-none" />
+          {submitError && <div className="text-red-500 text-sm mb-2">{submitError}</div>}
+          <button type="submit" disabled={submitLoading} className="w-full py-2 rounded-full bg-[#4D7C4D] text-white font-medium hover:bg-[#3a5e3a] transition">{submitLoading ? 'جاري الإرسال...' : 'إرسال القصة'}</button>
+        </form>
+        )}
       </div>
     </div>
   );
@@ -414,6 +342,7 @@ const SuccessStories = () => {
             <button
               className="px-8 py-3 rounded-md text-white font-medium transition duration-300 hover:shadow-lg"
               style={{ background: colors.contrast }}
+              onClick={() => setShowSubmitModal(true)}
             >
               شارك قصتك الآن
             </button>
@@ -421,10 +350,9 @@ const SuccessStories = () => {
         </div>
       </section>
 
-      
-
       {/* Story Modal */}
       {activeStory && <StoryModal story={activeStory} />}
+      {showSubmitModal && <SubmitStoryModal />}
     </div>
   );
 };

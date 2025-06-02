@@ -140,332 +140,123 @@ const AdminPrograms = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
-      <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Header Section */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 mb-8">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-[#780C28] rounded-xl">
-                <Calendar className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h2 className="text-3xl font-bold text-[#780C28]">
-                  إدارة البرامج
-                </h2>
-                <p className="text-gray-500 mt-1">إدارة البرامج والأنشطة</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-6">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-4 bg-gray-100 p-1 rounded-xl">
-                  <button
-                    onClick={() => {
-                      setViewMode(true);
-                      setEditingProgram(null);
-                      setFormData({
-                        name: "",
-                        description: "",
-                        category: "",
-                        startDate: "",
-                        endDate: "",
-                      });
-                    }}
-                    className={`px-6 py-2 rounded-lg transition-all duration-200 ${
-                      viewMode
-                        ? "bg-white text-[#780C28] shadow-md font-medium"
-                        : "text-gray-600 hover:bg-gray-50"
-                    }`}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <List className="w-5 h-5" />
-                      <span>عرض البرامج</span>
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setViewMode(false);
-                      setEditingProgram(null);
-                      setFormData({
-                        name: "",
-                        description: "",
-                        category: "",
-                        startDate: "",
-                        endDate: "",
-                      });
-                    }}
-                    className={`px-6 py-2 rounded-lg transition-all duration-200 ${
-                      !viewMode
-                        ? "bg-white text-[#780C28] shadow-md font-medium"
-                        : "text-gray-600 hover:bg-gray-50"
-                    }`}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <Plus className="w-5 h-5" />
-                      <span>إضافة برنامج</span>
-                    </div>
-                  </button>
-                </div>
-              </div>
-            </div>
+        <div className="bg-white rounded-lg shadow p-4 mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Calendar className="w-7 h-7 text-[#780C28]" />
+            <h2 className="text-xl font-bold text-[#780C28]">إدارة البرامج</h2>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                setViewMode(true);
+                setEditingProgram(null);
+                setFormData({ name: "", description: "", category: "", startDate: "", endDate: "" });
+              }}
+              className={`px-4 py-2 rounded-md text-sm font-medium border ${viewMode ? 'bg-[#780C28] text-white' : 'bg-white text-[#780C28] border-[#780C28]'} transition`}
+            >
+              عرض البرامج
+            </button>
+            <button
+              onClick={() => {
+                setViewMode(false);
+                setEditingProgram(null);
+                setFormData({ name: "", description: "", category: "", startDate: "", endDate: "" });
+              }}
+              className={`px-4 py-2 rounded-md text-sm font-medium border ${!viewMode ? 'bg-[#780C28] text-white' : 'bg-white text-[#780C28] border-[#780C28]'} transition`}
+            >
+              إضافة برنامج
+            </button>
           </div>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 rounded-r-xl shadow-md animate-pulse">
-            <div className="flex">
-              <div className="ml-3">
-                <p className="text-red-800 font-medium">{error}</p>
-              </div>
-            </div>
-          </div>
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">{error}</div>
         )}
 
         {/* Main Content */}
-        {/* Main Content */}
-        <div className="transition-all duration-500 ease-in-out">
+        <div>
           {viewMode ? (
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-lg shadow p-4">
               {loading ? (
-                <div className="p-12 text-center">
-                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#780C28] border-t-transparent"></div>
-                  <p className="mt-4 text-gray-600 text-lg">جاري التحميل...</p>
-                </div>
+                <div className="py-12 text-center text-gray-500">جاري التحميل...</div>
               ) : (
-                <div className="divide-y divide-gray-100">
-                  {programs.map((program, index) => (
-                    <div
-                      key={program._id}
-                      className={`p-6 transition-all duration-300 ${
-                        program.isDeleted
-                          ? "bg-gradient-to-r from-red-50 to-orange-50 border-l-4 border-red-400"
-                          : "hover:bg-gray-50 hover:shadow-md"
-                      } transform hover:scale-[1.01]`}
-                    >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-3 mb-3">
-                            <div
-                              className={`p-2 rounded-lg ${
-                                program.isDeleted
-                                  ? "bg-red-100"
-                                  : "bg-[#780C28]/10"
-                              }`}
-                            >
-                              <Calendar
-                                className={`${
-                                  program.isDeleted
-                                    ? "text-red-500"
-                                    : "text-[#780C28]"
-                                }`}
-                                size={20}
-                              />
-                            </div>
-                            <div>
-                              <h3
-                                className={`text-xl font-bold ${
-                                  program.isDeleted
-                                    ? "text-red-700"
-                                    : "text-gray-800"
-                                }`}
-                              >
-                                {program.name}
-                                {program.isDeleted && (
-                                  <span className="ml-2 px-2 py-1 text-xs bg-red-100 text-red-600 rounded-full">
-                                    محذوفة
-                                  </span>
-                                )}
-                              </h3>
-                              <p
-                                className={`text-gray-600 leading-relaxed mb-4 ${
-                                  program.isDeleted ? "text-red-400" : ""
-                                }`}
-                              >
-                                {program.description}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex space-x-4">
-                            <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                program.isDeleted
-                                  ? "bg-red-100 text-red-800"
-                                  : "bg-[#780C28]/10 text-[#780C28]"
-                              }`}
-                            >
-                              {program.category || "بدون فئة"}
-                            </span>
-                            <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                program.isDeleted
-                                  ? "bg-red-100 text-red-800"
-                                  : "bg-gray-100 text-gray-800"
-                              }`}
-                            >
-                              <Calendar className="w-3 h-3 mr-1" />
-                              {program.startDate} → {program.endDate}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex flex-col space-y-2 ml-6">
-                          {!program.isDeleted ? (
-                            <>
-                              <button
-                                onClick={() => handleEdit(program)}
-                                className="flex items-center px-4 py-2 bg-gradient-to-r from-[#6e8e59] to-[#780C28] text-white rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-                              >
-                                <Edit className="w-4 h-4 mr-2" />
-                                تعديل
-                              </button>
-                              <button
-                                onClick={() => handleSoftDelete(program._id)}
-                                className="flex items-center px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-                              >
-                                <Archive className="w-4 h-4 mr-2" />
-                                أرشيف
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <button
-                                onClick={() => handleRestore(program._id)}
-                                className="flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-                              >
-                                <RotateCcw className="w-4 h-4 mr-2" />
-                                استعادة
-                              </button>
-                              <button
-                                onClick={() => handleDelete(program._id)}
-                                className="flex items-center px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-                              >
-                                <Trash2 className="w-4 h-4 mr-2" />
-                                حذف نهائي
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-sm text-right">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-2 font-medium text-gray-700">اسم البرنامج</th>
+                        <th className="px-4 py-2 font-medium text-gray-700">الوصف</th>
+                        <th className="px-4 py-2 font-medium text-gray-700">الفئة</th>
+                        <th className="px-4 py-2 font-medium text-gray-700">الفترة</th>
+                        <th className="px-4 py-2 font-medium text-gray-700">الإجراءات</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {programs.map((program) => (
+                        <tr key={program._id} className={program.isDeleted ? 'bg-red-50 text-red-500' : ''}>
+                          <td className="px-4 py-2 font-semibold">{program.name}</td>
+                          <td className="px-4 py-2 max-w-xs truncate">{program.description}</td>
+                          <td className="px-4 py-2">{program.category || 'بدون فئة'}</td>
+                          <td className="px-4 py-2">{program.startDate} - {program.endDate}</td>
+                          <td className="px-4 py-2 flex gap-2">
+                            {!program.isDeleted ? (
+                              <>
+                                <button onClick={() => handleEdit(program)} className="px-3 py-1 rounded bg-gray-100 text-[#780C28] border border-[#780C28] text-xs">تعديل</button>
+                                <button onClick={() => handleSoftDelete(program._id)} className="px-3 py-1 rounded bg-gray-100 text-yellow-700 border border-yellow-400 text-xs">أرشيف</button>
+                              </>
+                            ) : (
+                              <>
+                                <button onClick={() => handleRestore(program._id)} className="px-3 py-1 rounded bg-gray-100 text-green-700 border border-green-400 text-xs">استعادة</button>
+                                <button onClick={() => handleDelete(program._id)} className="px-3 py-1 rounded bg-gray-100 text-red-700 border border-red-400 text-xs">حذف نهائي</button>
+                              </>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {programs.length === 0 && <div className="text-center text-gray-400 py-8">لا توجد برامج</div>}
                 </div>
               )}
             </div>
           ) : (
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-[#780C28] to-[#6e8e59] bg-clip-text text-transparent mb-2">
-                  {editingProgram ? "تعديل البرنامج" : "إضافة برنامج جديد"}
-                </h2>
-                <p className="text-gray-600">
-                  املأ البيانات المطلوبة لإضافة برنامج جديد
-                </p>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="block text-gray-700 font-medium">
-                      اسم البرنامج
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#780C28] focus:ring-2 focus:ring-[#780C28]/20 transition-all duration-200 outline-none"
-                      placeholder="أدخل اسم البرنامج"
-                    />
+            <div className="bg-white rounded-lg shadow p-4 max-w-xl mx-auto">
+              <h3 className="text-lg font-bold text-[#780C28] mb-4">{editingProgram ? 'تعديل البرنامج' : 'إضافة برنامج جديد'}</h3>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm text-gray-700 mb-1">اسم البرنامج</label>
+                  <input type="text" name="name" value={formData.name} onChange={handleInputChange} required className="w-full border border-gray-200 rounded px-3 py-2 focus:border-[#780C28] focus:ring-[#780C28]/20 text-sm" />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-700 mb-1">الفئة</label>
+                  <select name="category" value={formData.category} onChange={handleInputChange} className="w-full border border-gray-200 rounded px-3 py-2 text-sm">
+                    <option value="">اختر الفئة</option>
+                    {categories.map((category) => (
+                      <option key={category} value={category}>{category}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-700 mb-1">الوصف</label>
+                  <textarea name="description" value={formData.description} onChange={handleInputChange} rows="3" className="w-full border border-gray-200 rounded px-3 py-2 text-sm" />
+                </div>
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <label className="block text-sm text-gray-700 mb-1">تاريخ البدء</label>
+                    <input type="date" name="startDate" value={formData.startDate} onChange={handleInputChange} className="w-full border border-gray-200 rounded px-3 py-2 text-sm" />
                   </div>
-
-                  <div className="space-y-2">
-                    <label className="block text-gray-700 font-medium">
-                      الفئة
-                    </label>
-                    <select
-                      name="category"
-                      value={formData.category}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#6e8e59] focus:ring-2 focus:ring-[#6e8e59]/20 transition-all duration-200 outline-none"
-                    >
-                      <option value="">اختر الفئة</option>
-                      {categories.map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
+                  <div className="flex-1">
+                    <label className="block text-sm text-gray-700 mb-1">تاريخ الانتهاء</label>
+                    <input type="date" name="endDate" value={formData.endDate} onChange={handleInputChange} className="w-full border border-gray-200 rounded px-3 py-2 text-sm" />
                   </div>
                 </div>
-
-                <div className="space-y-2">
-                  <label className="block text-gray-700 font-medium">
-                    الوصف
-                  </label>
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    rows="4"
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#780C28] focus:ring-2 focus:ring-[#780C28]/20 transition-all duration-200 outline-none resize-none"
-                    placeholder="أدخل وصف البرنامج"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="block text-gray-700 font-medium">
-                      تاريخ البدء
-                    </label>
-                    <input
-                      type="date"
-                      name="startDate"
-                      value={formData.startDate}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#780C28] focus:ring-2 focus:ring-[#780C28]/20 transition-all duration-200 outline-none"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-gray-700 font-medium">
-                      تاريخ الانتهاء
-                    </label>
-                    <input
-                      type="date"
-                      name="endDate"
-                      value={formData.endDate}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#6e8e59] focus:ring-2 focus:ring-[#6e8e59]/20 transition-all duration-200 outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end space-x-4 pt-6">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setViewMode(true);
-                      setEditingProgram(null);
-                      setFormData({
-                        name: "",
-                        description: "",
-                        category: "",
-                        startDate: "",
-                        endDate: "",
-                      });
-                    }}
-                    className="px-8 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transform hover:scale-105 transition-all duration-200 font-medium"
-                  >
-                    إلغاء
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-8 py-3 bg-gradient-to-r from-[#780C28] to-[#6e8e59] text-white rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-200 font-medium"
-                  >
-                    {editingProgram ? "حفظ التعديلات" : "إضافة البرنامج"}
-                  </button>
+                <div className="flex justify-end gap-2 mt-4">
+                  <button type="button" onClick={() => { setViewMode(true); setEditingProgram(null); setFormData({ name: '', description: '', category: '', startDate: '', endDate: '' }); }} className="px-5 py-2 bg-gray-100 text-gray-700 rounded border border-gray-200 text-sm">إلغاء</button>
+                  <button type="submit" className="px-5 py-2 bg-[#780C28] text-white rounded text-sm">{editingProgram ? 'حفظ التعديلات' : 'إضافة البرنامج'}</button>
                 </div>
               </form>
             </div>

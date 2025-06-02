@@ -14,27 +14,16 @@ const resourceSchema = new mongoose.Schema({
   category: {
     type: String,
     required: [true, 'Category is required'],
-    enum: ['articles', 'videos', 'presentations', 'pdf']
+    enum: ['articles', 'videos', 'presentations', 'pdf'],
   },
+  images: [{
+    type: String,
+  }],
   fileUrl: {
     type: String,
-    required: [true, 'File URL is required']
   },
-  thumbnailUrl: {
+  externalUrl: {
     type: String,
-    default: ''
-  },
-  tags: [{
-    type: String,
-    trim: true
-  }],
-  isDownloadable: {
-    type: Boolean,
-    default: true
-  },
-  downloadCount: {
-    type: Number,
-    default: 0
   },
   isDeleted: {
     type: Boolean,
@@ -45,6 +34,6 @@ const resourceSchema = new mongoose.Schema({
 });
 
 // Add text index for search functionality
-resourceSchema.index({ title: 'text', description: 'text', tags: 'text' });
+resourceSchema.index({ title: 'text', description: 'text' });
 
 module.exports = mongoose.model('Resource', resourceSchema); 

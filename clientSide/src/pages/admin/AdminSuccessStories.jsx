@@ -1,412 +1,3 @@
-// // components/SuccessStories/AdminSuccessStories.jsx
-// import React, { useState, useEffect } from "react";
-// import axios from "axios";
-// import { Switch } from "@headlessui/react";
-// import { Trash2, Undo } from "lucide-react"; // Import icons
-// const AdminSuccessStories = () => {
-//   const [stories, setStories] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState("");
-//   const [viewMode, setViewMode] = useState(true); // true for view, false for create/edit
-//   const [editingStory, setEditingStory] = useState(null);
-//   const [formData, setFormData] = useState({
-//     name: "",
-//     imageUrl: "",
-//     shortStory: "",
-//     videoUrl: "",
-//   });
-
-//   useEffect(() => {
-//     if (viewMode) {
-//       fetchStories();
-//     }
-//   }, [viewMode]);
-
-//   const fetchStories = async () => {
-//     try {
-//       const token = localStorage.getItem("adminToken");
-//       const response = await axios.get("http://localhost:5000/api/success", {
-//         headers: { Authorization: `Bearer ${token}` },
-//       });
-//       setStories(response.data);
-//     } catch (err) {
-//       setError(err.response?.data?.message || "Failed to fetch stories");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-//   const handleRestore = async (id) => {
-//     try {
-//       const token = localStorage.getItem("adminToken");
-//       await axios.patch(
-//         `http://localhost:5000/api/success/${id}/restore`,
-//         {},
-//         { headers: { Authorization: `Bearer ${token}` } }
-//       );
-//       fetchStories();
-//     } catch (err) {
-//       setError(err.response?.data?.message || "Failed to restore story");
-//     }
-//   };
-//   const handleInputChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormData((prev) => ({ ...prev, [name]: value }));
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     try {
-//       const token = localStorage.getItem("adminToken");
-//       if (editingStory) {
-//         await axios.put(
-//           `http://localhost:5000/api/success/${editingStory._id}`,
-//           formData,
-//           { headers: { Authorization: `Bearer ${token}` } }
-//         );
-//       } else {
-//         await axios.post("http://localhost:5000/api/success", formData, {
-//           headers: { Authorization: `Bearer ${token}` },
-//         });
-//       }
-//       setViewMode(true);
-//       fetchStories();
-//       setEditingStory(null);
-//       setFormData({ name: "", imageUrl: "", shortStory: "", videoUrl: "" });
-//     } catch (err) {
-//       setError(err.response?.data?.message || "Failed to save story");
-//     }
-//   };
-
-//   const handleEdit = (story) => {
-//     setEditingStory(story);
-//     setFormData({
-//       name: story.name,
-//       imageUrl: story.imageUrl,
-//       shortStory: story.shortStory,
-//       videoUrl: story.videoUrl,
-//     });
-//     setViewMode(false);
-//   };
-
-//   const handleSoftDelete = async (id) => {
-//     try {
-//       const token = localStorage.getItem("adminToken");
-//       await axios.patch(
-//         `http://localhost:5000/api/success/${id}/soft-delete`,
-//         {},
-//         { headers: { Authorization: `Bearer ${token}` } }
-//       );
-//       fetchStories();
-//     } catch (err) {
-//       setError(err.response?.data?.message || "Failed to delete story");
-//     }
-//   };
-
-//   const handleDelete = async (id) => {
-//     try {
-//       const token = localStorage.getItem("adminToken");
-//       await axios.delete(`http://localhost:5000/api/success/${id}`, {
-//         headers: { Authorization: `Bearer ${token}` },
-//       });
-//       fetchStories();
-//     } catch (err) {
-//       setError(err.response?.data?.message || "Failed to delete story");
-//     }
-//   };
-
-//   return (
-//     <div className="space-y-6">
-//       <div className="flex justify-between items-center">
-//         <h2 className="text-xl font-bold text-[#780C28]">قصص النجاح</h2>
-
-//         <Switch.Group>
-//           <div className="flex items-center">
-//             <Switch.Label className="mr-3 text-gray-700">
-//               {viewMode
-//                 ? "عرض القصص"
-//                 : editingStory
-//                 ? "تعديل القصة"
-//                 : "إضافة قصة"}
-//             </Switch.Label>
-//             <Switch
-//               checked={!viewMode}
-//               onChange={() => {
-//                 setViewMode(!viewMode);
-//                 if (!viewMode) {
-//                   setEditingStory(null);
-//                   setFormData({
-//                     name: "",
-//                     imageUrl: "",
-//                     shortStory: "",
-//                     videoUrl: "",
-//                   });
-//                 }
-//               }}
-//               className={`${
-//                 !viewMode ? "bg-[#780C28]" : "bg-gray-200"
-//               } relative inline-flex h-6 w-11 items-center rounded-full transition-colors`}
-//             >
-//               <span
-//                 className={`${
-//                   !viewMode ? "translate-x-6" : "translate-x-1"
-//                 } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
-//               />
-//             </Switch>
-//           </div>
-//         </Switch.Group>
-//       </div>
-
-//       {error && (
-//         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-//           {error}
-//         </div>
-//       )}
-
-//       {/* {viewMode ? (
-//         <div className="bg-white rounded-lg shadow overflow-hidden">
-//           {loading ? (
-//             <div className="p-6 text-center">جاري التحميل...</div>
-//           ) : (
-//             <div className="divide-y divide-gray-200">
-//               {stories.map((story) => (
-//                 <div key={story._id} className="p-4">
-//                   <div className="flex justify-between items-start">
-//                     <div>
-//                       <h3 className="font-bold text-lg">{story.name}</h3>
-//                       <p className="text-gray-600 line-clamp-2">
-//                         {story.shortStory}
-//                       </p>
-//                       <div className="flex space-x-4 mt-2">
-//                         {story.videoUrl && (
-//                           <a
-//                             href={story.videoUrl}
-//                             target="_blank"
-//                             rel="noopener noreferrer"
-//                             className="text-blue-600 hover:underline"
-//                           >
-//                             مشاهدة الفيديو
-//                           </a>
-//                         )}
-//                         {story.imageUrl && (
-//                           <a
-//                             href={story.imageUrl}
-//                             target="_blank"
-//                             rel="noopener noreferrer"
-//                             className="text-blue-600 hover:underline"
-//                           >
-//                             عرض الصورة
-//                           </a>
-//                         )}
-//                       </div>
-//                     </div>
-//                     <div className="flex space-x-2">
-//                       <button
-//                         onClick={() => handleEdit(story)}
-//                         className="text-blue-600 hover:text-blue-800"
-//                       >
-//                         تعديل
-//                       </button>
-//                       <button
-//                         onClick={() => handleSoftDelete(story._id)}
-//                         className="text-yellow-600 hover:text-yellow-800"
-//                       >
-//                         حذف
-//                       </button>
-//                     </div>
-//                   </div>
-//                 </div>
-//               ))}
-//             </div>
-//           )}
-//         </div>
-//       ) : ( */}
-//       {viewMode ? (
-//         <div className="bg-white rounded-lg shadow overflow-hidden">
-//           {loading ? (
-//             <div className="p-6 text-center">جاري التحميل...</div>
-//           ) : (
-//             <div className="divide-y divide-gray-200">
-//               {stories.map((story) => (
-//                 <div
-//                   key={story._id}
-//                   className={`p-4 ${
-//                     story.isDeleted ? "bg-red-50 border-l-4 border-red-500" : ""
-//                   }`}
-//                 >
-//                   <div className="flex justify-between items-start">
-//                     <div>
-//                       <h3
-//                         className={`font-bold text-lg ${
-//                           story.isDeleted ? "text-red-700" : ""
-//                         }`}
-//                       >
-//                         {story.name}
-//                         {story.isDeleted && (
-//                           <span className="ml-2 text-sm text-red-500">
-//                             (محذوفة)
-//                           </span>
-//                         )}
-//                       </h3>
-//                       <p
-//                         className={`text-gray-600 line-clamp-2 ${
-//                           story.isDeleted ? "text-red-300" : ""
-//                         }`}
-//                       >
-//                         {story.shortStory}
-//                       </p>
-//                       <div className="flex space-x-4 mt-2">
-//                         {story.videoUrl && (
-//                           <a
-//                             href={story.videoUrl}
-//                             target="_blank"
-//                             rel="noopener noreferrer"
-//                             className={`hover:underline ${
-//                               story.isDeleted ? "text-red-400" : "text-blue-600"
-//                             }`}
-//                           >
-//                             مشاهدة الفيديو
-//                           </a>
-//                         )}
-//                         {story.imageUrl && (
-//                           <a
-//                             href={story.imageUrl}
-//                             target="_blank"
-//                             rel="noopener noreferrer"
-//                             className={`hover:underline ${
-//                               story.isDeleted ? "text-red-400" : "text-blue-600"
-//                             }`}
-//                           >
-//                             عرض الصورة
-//                           </a>
-//                         )}
-//                       </div>
-//                     </div>
-//                     <div className="flex space-x-2">
-//                       {!story.isDeleted ? (
-//                         <>
-//                           <button
-//                             onClick={() => handleEdit(story)}
-//                             className="text-blue-600 hover:text-blue-800"
-//                           >
-//                             تعديل
-//                           </button>
-//                           <button
-//                             onClick={() => handleSoftDelete(story._id)}
-//                             className="text-yellow-600 hover:text-yellow-800 flex items-center"
-//                           >
-//                             <Trash2 className="mr-1" size={16} />
-//                             أرشيف
-//                           </button>
-//                         </>
-//                       ) : (
-//                         <>
-//                           <button
-//                             onClick={() => handleRestore(story._id)}
-//                             className="text-green-600 hover:text-green-800 flex items-center"
-//                           >
-//                             <Undo className="mr-1" size={16} />
-//                             استعادة
-//                           </button>
-//                           <button
-//                             onClick={() => handleDelete(story._id)}
-//                             className="text-red-600 hover:text-red-800 flex items-center"
-//                           >
-//                             <Trash2 className="mr-1" size={16} />
-//                             حذف نهائي
-//                           </button>
-//                         </>
-//                       )}
-//                     </div>
-//                   </div>
-//                 </div>
-//               ))}
-//             </div>
-//           )}
-//         </div>
-//       ) : (
-//         <div className="bg-white rounded-lg shadow p-6">
-//           <h2 className="text-xl font-bold mb-4">
-//             {editingStory ? "تعديل قصة النجاح" : "إضافة قصة نجاح جديدة"}
-//           </h2>
-//           <form onSubmit={handleSubmit} className="space-y-4">
-//             <div>
-//               <label className="block text-gray-700 mb-1">الاسم</label>
-//               <input
-//                 type="text"
-//                 name="name"
-//                 value={formData.name}
-//                 onChange={handleInputChange}
-//                 required
-//                 className="w-full px-3 py-2 border rounded-lg"
-//               />
-//             </div>
-//             <div>
-//               <label className="block text-gray-700 mb-1">رابط الصورة</label>
-//               <input
-//                 type="text"
-//                 name="imageUrl"
-//                 value={formData.imageUrl}
-//                 onChange={handleInputChange}
-//                 required
-//                 className="w-full px-3 py-2 border rounded-lg"
-//               />
-//             </div>
-//             <div>
-//               <label className="block text-gray-700 mb-1">القصة المختصرة</label>
-//               <textarea
-//                 name="shortStory"
-//                 value={formData.shortStory}
-//                 onChange={handleInputChange}
-//                 required
-//                 rows="3"
-//                 className="w-full px-3 py-2 border rounded-lg"
-//               ></textarea>
-//             </div>
-//             <div>
-//               <label className="block text-gray-700 mb-1">
-//                 رابط الفيديو (اختياري)
-//               </label>
-//               <input
-//                 type="text"
-//                 name="videoUrl"
-//                 value={formData.videoUrl}
-//                 onChange={handleInputChange}
-//                 className="w-full px-3 py-2 border rounded-lg"
-//               />
-//             </div>
-//             <div className="flex justify-end space-x-3">
-//               <button
-//                 type="button"
-//                 onClick={() => {
-//                   setViewMode(true);
-//                   setEditingStory(null);
-//                   setFormData({
-//                     name: "",
-//                     imageUrl: "",
-//                     shortStory: "",
-//                     videoUrl: "",
-//                   });
-//                 }}
-//                 className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-//               >
-//                 إلغاء
-//               </button>
-//               <button
-//                 type="submit"
-//                 className="px-4 py-2 bg-[#780C28] text-white rounded-lg hover:bg-[#5a0920]"
-//               >
-//                 {editingStory ? "حفظ التعديلات" : "إضافة القصة"}
-//               </button>
-//             </div>
-//           </form>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default AdminSuccessStories;
-// components/SuccessStories/AdminSuccessStories.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Switch } from "@headlessui/react";
@@ -430,8 +21,9 @@ const AdminSuccessStories = () => {
     name: "",
     imageUrl: "",
     shortStory: "",
-    videoUrl: "",
   });
+  const [imageFile, setImageFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (viewMode) {
@@ -472,27 +64,75 @@ const AdminSuccessStories = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      // Create a preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setFormData(prev => ({ ...prev, imageUrl: previewUrl }));
+    }
+  };
+
+  const uploadImage = async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    
     try {
       const token = localStorage.getItem("adminToken");
+      const response = await axios.post(
+        "http://localhost:5000/api/upload",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+      return response.data.imageUrl;
+    } catch (error) {
+      throw new Error("Failed to upload image");
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setUploading(true);
+    try {
+      const token = localStorage.getItem("adminToken");
+      let finalImageUrl = formData.imageUrl;
+
+      // If there's a new image file, upload it
+      if (imageFile) {
+        finalImageUrl = await uploadImage(imageFile);
+      }
+
+      const storyData = {
+        ...formData,
+        imageUrl: finalImageUrl
+      };
+
       if (editingStory) {
         await axios.put(
           `http://localhost:5000/api/success/${editingStory._id}`,
-          formData,
+          storyData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } else {
-        await axios.post("http://localhost:5000/api/success", formData, {
+        await axios.post("http://localhost:5000/api/success", storyData, {
           headers: { Authorization: `Bearer ${token}` },
         });
       }
       setViewMode(true);
       fetchStories();
       setEditingStory(null);
-      setFormData({ name: "", imageUrl: "", shortStory: "", videoUrl: "" });
+      setFormData({ name: "", imageUrl: "", shortStory: "" });
+      setImageFile(null);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to save story");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -502,7 +142,6 @@ const AdminSuccessStories = () => {
       name: story.name,
       imageUrl: story.imageUrl,
       shortStory: story.shortStory,
-      videoUrl: story.videoUrl,
     });
     setViewMode(false);
   };
@@ -571,7 +210,6 @@ const AdminSuccessStories = () => {
                           name: "",
                           imageUrl: "",
                           shortStory: "",
-                          videoUrl: "",
                         });
                       }
                     }}
@@ -627,7 +265,6 @@ const AdminSuccessStories = () => {
                         name: "",
                         imageUrl: "",
                         shortStory: "",
-                        videoUrl: "",
                       });
                     }}
                     className={`px-6 py-2 rounded-lg transition-all duration-200 ${
@@ -650,7 +287,6 @@ const AdminSuccessStories = () => {
                         name: "",
                         imageUrl: "",
                         shortStory: "",
-                        videoUrl: "",
                       });
                     }}
                     className={`px-6 py-2 rounded-lg transition-all duration-200 ${
@@ -847,17 +483,23 @@ const AdminSuccessStories = () => {
 
                   <div className="space-y-2">
                     <label className="block text-gray-700 font-medium">
-                      رابط الصورة
+                      صورة القصة
                     </label>
                     <input
-                      type="url"
-                      name="imageUrl"
-                      value={formData.imageUrl}
-                      onChange={handleInputChange}
-                      required
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#6e8e59] focus:ring-2 focus:ring-[#6e8e59]/20 transition-all duration-200 outline-none"
-                      placeholder="https://example.com/image.jpg"
                     />
+                    {formData.imageUrl && (
+                      <div className="mt-2">
+                        <img
+                          src={formData.imageUrl}
+                          alt="Preview"
+                          className="w-32 h-32 object-cover rounded-lg"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -876,20 +518,6 @@ const AdminSuccessStories = () => {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="block text-gray-700 font-medium">
-                    رابط الفيديو (اختياري)
-                  </label>
-                  <input
-                    type="url"
-                    name="videoUrl"
-                    value={formData.videoUrl}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#6e8e59] focus:ring-2 focus:ring-[#6e8e59]/20 transition-all duration-200 outline-none"
-                    placeholder="https://youtube.com/watch?v=..."
-                  />
-                </div>
-
                 <div className="flex justify-end space-x-4 pt-6">
                   <button
                     type="button"
@@ -900,7 +528,6 @@ const AdminSuccessStories = () => {
                         name: "",
                         imageUrl: "",
                         shortStory: "",
-                        videoUrl: "",
                       });
                     }}
                     className="px-8 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transform hover:scale-105 transition-all duration-200 font-medium"

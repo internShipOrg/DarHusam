@@ -393,18 +393,55 @@ const createMedia = async (req, res) => {
   try {
     const { title, description, type } = req.body;
 
+    // Validate required fields
+    if (!title || !description || !type) {
+      return res.status(400).json({
+        success: false,
+        message: "Title, description, and type are required"
+      });
+    }
+
+    // Validate file
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No file uploaded"
+      });
+    }
+
+    // Validate file type matches the selected type
+    const isVideo = req.file.mimetype.startsWith('video/');
+    const isImage = req.file.mimetype.startsWith('image/');
+    
+    if ((type === 'video' && !isVideo) || (type === 'image' && !isImage)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid file type. Expected ${type} but received ${req.file.mimetype}`
+      });
+    }
+
+    const filePath = getFilePath(req.file);
+    
     const newMedia = new Media({
       title,
       description,
       type,
-      url: getFilePath(req.file),
-      thumbnail: type === "video" ? getFilePath(req.file) : null,
+      url: filePath,
+      thumbnail: type === "video" ? filePath : null,
     });
 
     await newMedia.save();
-    res.status(201).json(newMedia);
+    
+    res.status(201).json({
+      success: true,
+      data: newMedia
+    });
   } catch (error) {
-    res.status(409).json({ message: error.message });
+    console.error('Error in createMedia:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "An error occurred while creating the media"
+    });
   }
 };
 // Add this to your newsController.js

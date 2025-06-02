@@ -7,8 +7,7 @@ const { protect, authorize } = require('../middleware/auth');
 const {
   getAllResources,
   addResource,
-  deleteResource,
-  downloadResource
+  deleteResource
 } = require('../controllers/resourceController');
 
 // Ensure uploads directory exists
@@ -23,34 +22,73 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
+    // Create a unique filename with original extension
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    const ext = path.extname(file.originalname);
+    cb(null, 'image-' + uniqueSuffix + ext);
   }
 });
 
-// File filter
+// File filter for images only
 const fileFilter = (req, file, cb) => {
-  // Accept all file types for now
-  cb(null, true);
+  // Accept only image files
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('يجب أن تكون الملفات صوراً فقط'), false);
+  }
 };
 
+// Configure multer upload
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB limit
+    fileSize: 5 * 1024 * 1024, // 5MB limit per file
+    files: 10 // Maximum 10 files
   }
 });
 
+// Error handling middleware for multer
+const handleMulterError = (err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({
+        success: false,
+        message: 'حجم الملف يجب أن لا يتجاوز 5 ميجابايت'
+      });
+    }
+    if (err.code === 'LIMIT_FILE_COUNT') {
+      return res.status(400).json({
+        success: false,
+        message: 'يمكن تحميل 10 صور كحد أقصى'
+      });
+    }
+    return res.status(400).json({
+      success: false,
+      message: err.message
+    });
+  }
+  if (err) {
+    return res.status(400).json({
+      success: false,
+      message: err.message
+    });
+  }
+  next();
+};
+
 // Public routes
 router.get('/', getAllResources);
-router.get('/:id/download', downloadResource);
 
 // Protected routes (admin only)
-router.post('/', protect, authorize('admin'), upload.fields([
-  { name: 'file', maxCount: 1 },
-  { name: 'thumbnail', maxCount: 1 }
-]), addResource);
+router.post('/', 
+  protect, 
+  authorize('admin'), 
+  upload.array('images', 10),
+  handleMulterError,
+  addResource
+);
 
 router.delete('/:id', protect, authorize('admin'), deleteResource);
 
