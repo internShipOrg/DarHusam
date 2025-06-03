@@ -103,7 +103,7 @@ export default function ProgramsSlider() {
                 >
                   <div
                     onClick={() => console.log(`Navigate to ${_id}`)}
-                    className="group relative h-64 rounded-xl cursor-pointer overflow-hidden shadow-lg transition-all duration-300 bg-gradient-to-br from-gray-50 via-white to-gray-100 hover:shadow-xl border border-gray-200"
+                    className="group relative h-80 rounded-xl cursor-pointer overflow-hidden shadow-lg transition-all duration-300 bg-gradient-to-br from-gray-50 via-white to-gray-100 hover:shadow-xl border border-gray-200"
                   >
                     {/* Top accent line */}
                     <div className="absolute top-0 left-0 w-0 h-1 bg-[#6E8E59] group-hover:w-full transition-all duration-500" />
