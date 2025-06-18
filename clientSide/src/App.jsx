@@ -27,50 +27,59 @@ import TrainingPrograms from "./pages/TrainingPrograms";
 import ResourceLibrary from './components/ResourceLibrary'
 import AboutUs from "./components/AboutUs";
 import BookingPage from "./pages/BookingPage";
+import Login from './components/auth/Login';
+import Register from './components/auth/Register';
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import { AuthProvider } from './context/AuthContext';
+
 // Wrapper component to conditionally render Navbar and Footer
 const Layout = ({ children }) => {
   const location = useLocation();
-  const isAdminPage = location.pathname.startsWith("/admin");
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {!isAdminPage && <Navbar />}
-      <main className="flex-grow">{children}</main>
-      {!isAdminPage && <Footer />}
+    <div>
+      {!isAuthPage && <Navbar />}
+      <main className={!isAuthPage ? 'pt-28' : ''}>{children}</main>
+      {!isAuthPage && <Footer />}
     </div>
   );
 };
 
 const App = () => {
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/training-programs" element={<TrainingPrograms />} />
-          <Route path="/join-us/terms/:type" element={<TermsPage />} />
-          <Route path="/join-us" element={<JoinUsOptions />} />
-          <Route path="/join-us/volunteer" element={<VolunteerForm />} />
-          <Route path="/join-us/trainer" element={<TrainerForm />} />
-          <Route path="/join-us/trainee" element={<TraineeForm />} />
-          <Route path="/join-us/partner" element={<PartnerForm />} />
-          <Route
-            path="/join-us/individual"
-            element={<IndividualPartnerForm />}
-          />
-          <Route path="/news" element={<News />} />
-          <Route path="/" element={<HomePage />} />
-          <Route path="/resources" element={<ResourceLibrary />} />
+    <AuthProvider>
+      <Router>
+        <Layout>
+          <Routes>
+            <Route path="/training-programs" element={<TrainingPrograms />} />
+            <Route path="/join-us/terms/:type" element={<TermsPage />} />
+            <Route path="/join-us" element={<ProtectedRoute><JoinUsOptions /></ProtectedRoute>} />
+            <Route path="/join-us/volunteer" element={<VolunteerForm />} />
+            <Route path="/join-us/trainer" element={<TrainerForm />} />
+            <Route path="/join-us/trainee" element={<TraineeForm />} />
+            <Route path="/join-us/partner" element={<PartnerForm />} />
+            <Route
+              path="/join-us/individual"
+              element={<IndividualPartnerForm />}
+            />
+            <Route path="/news" element={<News />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/resources" element={<ResourceLibrary />} />
 
-          <Route path="/contact" element={<ContactUs />} />
-          <Route path="/about" element={<AboutUs />} />
-          <Route path="/bookingPage" element={<BookingPage />} />
-          <Route path="/admin/setup" element={<AdminSetup />} />
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/success-stories" element={<SuccessStories />} />
-        </Routes>
-      </Layout>
-    </Router>
+            <Route path="/contact" element={<ContactUs />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/bookingPage" element={<BookingPage />} />
+            <Route path="/admin/setup" element={<AdminSetup />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/success-stories" element={<SuccessStories />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Routes>
+        </Layout>
+      </Router>
+    </AuthProvider>
   );
 };
 

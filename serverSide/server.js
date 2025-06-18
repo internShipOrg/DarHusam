@@ -6,6 +6,7 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 
 const newsRoutes = require("./routes/newsRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 // Check for required environment variables
 if (!process.env.JWT_SECRET) {
@@ -53,6 +54,7 @@ app.use(express.static(path.join(__dirname, "public")));
 connectDB();
 
 // Routes
+app.use("/api/auth", authRoutes);
 app.use("/api/news", newsRoutes);
 app.use("/api", volunteerRoutes);
 app.use("/api", trainerRoutes);
